@@ -1,0 +1,71 @@
+﻿keyword,frequency
+Agentic AI,80
+RAG,65
+AI agents,60
+SWE-bench,56
+agentic workflows,45
+Agentic RAG,42
+SWE-bench Live,40
+GraphRAG,38
+multi-agent,36
+Multi-SWE-bench,35
+function calling,34
+GitHub Copilot,34
+speculative decoding,32
+Cursor,32
+tool use,28
+DPO,28
+autonomous coding,26
+vector database,26
+quantization,26
+vLLM,26
+CodeBuddy IDE,26
+LoRA,25
+MoE,25
+agent framework,24
+knowledge graph,24
+RLHF,24
+collaborative decoding,24
+long-context,23
+synthetic data,23
+orchestration,22
+hybrid search,22
+Transformer,22
+FlashAttention,22
+multimodal,22
+structured generation,22
+Claude 4 Sonnet,22
+code agents,21
+SFT,21
+debugging,21
+agent memory,20
+unit tests,20
+QLoRA,20
+instruction tuning,20
+safety alignment,20
+test generation,20
+OpenAI o-series,20
+self-play fine-tuning,19
+Mixture-of-Agents,19
+KV cache,19
+program repair,19
+Gemini code,19
+planning,18
+commit-level evals,18
+distillation,18
+SLM (small language model),18
+tensorRT-LLM,18
+Codeium,18
+evals,18
+function schema,18
+JSON mode,18
+Ray,18
+benchmark contamination,17
+OpenHands,17
+red teaming,17
+Triton Inference Server,17
+Mamba,16
+content filtering,16
+KServe,16
+state space models,15
+OpenDevin,15
