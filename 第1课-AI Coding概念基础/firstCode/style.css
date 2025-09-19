@@ -1,0 +1,266 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #faf8ef;
+    color: #776e65;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 60px;
+    font-weight: bold;
+    color: #776e65;
+}
+
+.score-container {
+    display: flex;
+    gap: 10px;
+}
+
+.score-box {
+    background-color: #bbada0;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 3px;
+    text-align: center;
+    min-width: 80px;
+}
+
+.score-label {
+    font-size: 14px;
+    display: block;
+}
+
+#score, #best-score {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.game-intro {
+    margin-bottom: 20px;
+}
+
+#new-game-button, #try-again-button, #keep-going-button, #try-again-win-button {
+    background-color: #8f7a66;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 10px 15px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+#new-game-button:hover, #try-again-button:hover, #keep-going-button:hover, #try-again-win-button:hover {
+    background-color: #9f8b77;
+}
+
+.game-container {
+    position: relative;
+    background-color: #bbada0;
+    border-radius: 6px;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 15px;
+    position: relative;
+}
+
+.grid-cell {
+    width: 100%;
+    height: 100px;
+    background-color: rgba(238, 228, 218, 0.35);
+    border-radius: 3px;
+}
+
+.tile {
+    position: absolute;
+    width: calc(25% - 15px);
+    height: 100px;
+    border-radius: 3px;
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 100px;
+    transition: all 0.1s ease-in-out;
+}
+
+.tile-2 {
+    background-color: #eee4da;
+    color: #776e65;
+}
+
+.tile-4 {
+    background-color: #ede0c8;
+    color: #776e65;
+}
+
+.tile-8 {
+    background-color: #f2b179;
+    color: white;
+}
+
+.tile-16 {
+    background-color: #f59563;
+    color: white;
+}
+
+.tile-32 {
+    background-color: #f67c5f;
+    color: white;
+}
+
+.tile-64 {
+    background-color: #f65e3b;
+    color: white;
+}
+
+.tile-128 {
+    background-color: #edcf72;
+    color: white;
+    font-size: 35px;
+}
+
+.tile-256 {
+    background-color: #edcc61;
+    color: white;
+    font-size: 35px;
+}
+
+.tile-512 {
+    background-color: #edc850;
+    color: white;
+    font-size: 35px;
+}
+
+.tile-1024 {
+    background-color: #edc53f;
+    color: white;
+    font-size: 30px;
+}
+
+.tile-2048 {
+    background-color: #edc22e;
+    color: white;
+    font-size: 30px;
+}
+
+.game-message {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(238, 228, 218, 0.73);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 6px;
+    z-index: 100;
+}
+
+.game-message p {
+    font-size: 60px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.game-won-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.tile-new {
+    animation: appear 0.2s;
+}
+
+.tile-merged {
+    animation: pop 0.2s;
+}
+
+@keyframes appear {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes pop {
+    0% {
+        transform: scale(0.8);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@media (max-width: 520px) {
+    .grid-cell, .tile {
+        height: 80px;
+    }
+    
+    .tile {
+        line-height: 80px;
+        font-size: 35px;
+    }
+    
+    .tile-128, .tile-256, .tile-512 {
+        font-size: 30px;
+    }
+    
+    .tile-1024, .tile-2048 {
+        font-size: 25px;
+    }
+}
+
+@media (max-width: 420px) {
+    .grid-cell, .tile {
+        height: 65px;
+    }
+    
+    .tile {
+        line-height: 65px;
+        font-size: 30px;
+    }
+    
+    .tile-128, .tile-256, .tile-512 {
+        font-size: 25px;
+    }
+    
+    .tile-1024, .tile-2048 {
+        font-size: 20px;
+    }
+}
