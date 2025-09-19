@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>五子棋</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0d9b5; /* 木质背景 */
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        #status {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            height: 30px;
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(15, 30px);
+            grid-template-rows: repeat(15, 30px);
+            border: 2px solid #654321;
+            background-color: #e8c9a7; /* 浅木色 */
+            position: relative;
+        }
+
+        .cell {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #aaa;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 星位标记 */
+        .star::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background-color: #654321;
+            border-radius: 50%;
+        }
+
+        /* 棋子样式 */
+        .stone {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .black {
+            background-color: black;
+        }
+
+        .white {
+            background-color: white;
+            border: 1px solid #ccc;
+        }
+
+        #resetBtn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #resetBtn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div id="status">当前回合: 黑方</div>
+        <div id="board"></div>
+        <button id="resetBtn">重新开始</button>
+    </div>
+
+    <script>
+        const BOARD_SIZE = 15;
+        let board = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(0)); // 0=空, 1=黑, 2=白
+        let currentPlayer = 1; // 1=黑, 2=白
+        let gameOver = false;
+
+        // 初始化棋盘
+        const boardElement = document.getElementById('board');
+        const statusElement = document.getElementById('status');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // 创建棋盘格子
+        for (let i = 0; i < BOARD_SIZE; i++) {
+            for (let j = 0; j < BOARD_SIZE; j++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.dataset.row = i;
+                cell.dataset.col = j;
+
+                // 添加星位标记（传统五子棋中心点）
+                if ((i === 3 || i === 7 || i === 11) && (j === 3 || j === 7 || j === 11)) {
+                    cell.classList.add('star');
+                }
+
+                cell.addEventListener('click', handleCellClick);
+                boardElement.appendChild(cell);
+            }
+        }
+
+        // 处理点击事件
+        function handleCellClick(event) {
+            if (gameOver) return;
+
+            const row = parseInt(event.target.dataset.row);
+            const col = parseInt(event.target.dataset.col);
+
+            if (board[row][col] !== 0) return; // 已有棋子
+
+            // 放置棋子
+            board[row][col] = currentPlayer;
+            const stone = document.createElement('div');
+            stone.className = `stone ${currentPlayer === 1 ? 'black' : 'white'}`;
+            event.target.appendChild(stone);
+
+            // 检查胜负
+            if (checkWin(row, col)) {
+                gameOver = true;
+                const winner = currentPlayer === 1 ? '黑方' : '白方';
+                setTimeout(() => alert(`&#127881; ${winner} 胜利！`), 100);
+                return;
+            }
+
+            // 切换玩家
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+            statusElement.textContent = `当前回合: ${currentPlayer === 1 ? '黑方' : '白方'}`;
+        }
+
+        // 检查是否胜利
+        function checkWin(row, col) {
+            const directions = [
+                [0, 1],   // 水平 →
+                [1, 0],   // 垂直 ↓
+                [1, 1],   // 主对角线 &#8600;
+                [1, -1]   // 副对角线 &#8601;
+            ];
+
+            for (const [dx, dy] of directions) {
+                let count = 1;
+                // 正向检查
+                for (let i = 1; i < 5; i++) {
+                    const newRow = row + dx * i;
+                    const newCol = col + dy * i;
+                    if (newRow >= 0 && newRow < BOARD_SIZE && 
+                        newCol >= 0 && newCol < BOARD_SIZE && 
+                        board[newRow][newCol] === currentPlayer) {
+                        count++;
+                    } else {
+                        break;
+                    }
+                }
+                // 反向检查
+                for (let i = 1; i < 5; i++) {
+                    const newRow = row - dx * i;
+                    const newCol = col - dy * i;
+                    if (newRow >= 0 && newRow < BOARD_SIZE && 
+                        newCol >= 0 && newCol < BOARD_SIZE && 
+                        board[newRow][newCol] === currentPlayer) {
+                        count++;
+                    } else {
+                        break;
+                    }
+                }
+                if (count >= 5) return true;
+            }
+            return false;
+        }
+
+        // 重置游戏
+        resetBtn.addEventListener('click', () => {
+            board = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(0));
+            currentPlayer = 1;
+            gameOver = false;
+            statusElement.textContent = '当前回合: 黑方';
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.innerHTML = ''; // 清空所有棋子
+            });
+        });
+    </script>
+</body>
+</html>
