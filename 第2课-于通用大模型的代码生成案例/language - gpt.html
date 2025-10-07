@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>2014-2024 编程语言火热度 3D 趋势图（可编辑）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- ECharts v5 与 echarts-gl 2.0.9（与 ECharts 5 兼容） -->
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts-gl@2.0.9/dist/echarts-gl.min.js"></script>
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#111a33; --muted:#8aa4ff; --txt:#e9eeff; --accent:#5ac8fa;
+      --table-bg:#0e152b; --cell:#162140; --border:#23325e;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.6 system-ui,-apple-system,'Segoe UI',Roboto,Ubuntu,'Helvetica Neue','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif}
+    header{padding:18px 20px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#0d1429 0%,#0b1020 100%)}
+    h1{margin:0;font-size:18px;letter-spacing:.5px}
+    .subtitle{opacity:.85;font-size:13px;margin-top:6px}
+    .wrap{display:grid;grid-template-columns: 1.2fr .95fr; gap:18px; padding:18px 20px}
+    #chart{width:100%;height:72vh;min-height:540px;border-radius:16px;background:radial-gradient(1200px 600px at 10% 10%,#162140 0%,#0b1020 60%);box-shadow:0 10px 30px rgba(0,0,0,.35) inset}
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+    .panel header{background:transparent;border:0;padding:14px 16px}
+    .panel h2{margin:0;font-size:15px}
+    .panel .content{padding:0 14px 14px}
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
+    .btn{
+      appearance:none;border:1px solid var(--border);background:linear-gradient(180deg,#1a2550,#101a3a);
+      color:var(--txt);padding:8px 12px;border-radius:10px;cursor:pointer;
+      transition:all .2s ease; font-weight:600
+    }
+    .btn:hover{border-color:#3b56a5;transform:translateY(-1px)}
+    .btn.secondary{background:#0f1631}
+    .btn.accent{background:linear-gradient(180deg,#37b4ff,#2989ff); border-color:#1e7be0}
+    .table-wrap{overflow:auto;max-height:58vh;border:1px solid var(--border);border-radius:12px;background:var(--table-bg)}
+    table{width:100%;border-collapse:separate;border-spacing:0;min-width:820px}
+    th,td{padding:10px 8px;border-bottom:1px solid var(--border)}
+    th{position:sticky;top:0;background:#122050;z-index:1;color:#eaf0ff;font-weight:700}
+    td{background:var(--cell)}
+    td[contenteditable="true"]{outline:none}
+    td[contenteditable="true"]:focus{box-shadow:inset 0 0 0 2px var(--accent);background:#0f1b3b}
+    .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+    .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:middle}
+    footer{padding:10px 20px 18px;color:var(--muted);opacity:.9}
+    .note{font-size:12px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>2014–2024 编程语言年度火热度 · 3D 趋势图</h1>
+    <div class="subtitle">数据可编辑 · ECharts GL 3D 折线 · 适合 PPT/展示（示例数据，支持一键更新）</div>
+  </header>
+
+  <div class="wrap">
+    <div id="chart" aria-label="3D趋势图"></div>
+
+    <section class="panel" aria-label="数据编辑面板">
+      <header><h2>编辑数据（双击单元格修改数值，点击“应用更改到图表”）</h2></header>
+      <div class="content">
+        <div class="toolbar">
+          <button class="btn accent" id="applyBtn">应用更改到图表</button>
+          <button class="btn secondary" id="resetBtn">重置示例数据</button>
+          <button class="btn" id="downloadBtn">下载PNG图像</button>
+        </div>
+        <div class="legend" id="legend"></div>
+        <div class="table-wrap">
+          <table id="dataTable"></table>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="note">
+    注：火热度为 0–100 的示例指数（可编辑）。需要更贴近现实的数据时，可直接粘贴/修改表格数值并“应用更改到图表”。
+  </footer>
+
+<script>
+  // 年份与语言
+  const years = Array.from({length: 11}, (_,i)=> 2014 + i);
+  const languages = ["C/C++","Python","Java","PHP","C#","JavaScript"];
+
+  // 示例火热度（0~100），可在右侧表格编辑
+  const sampleData = {
+    "C/C++":     [60,61,60,59,58,60,62,63,64,65,66],
+    "Python":    [35,38,42,47,53,60,68,74,80,85,90],
+    "Java":      [70,69,68,67,66,65,64,63,62,61,60],
+    "PHP":       [55,53,50,48,46,44,42,40,38,36,34],
+    "C#":        [45,46,47,49,50,52,54,56,58,60,62],
+    "JavaScript":[75,76,78,79,80,81,83,85,86,87,88]
+  };
+
+  // 配色（与图例对应）
+  const palette = ["#4cc9f0","#f72585","#fca311","#43d9a3","#a78bfa","#22c55e"];
+
+  // 构建数据表
+  const table = document.getElementById('dataTable');
+  function buildTable(data){
+    table.innerHTML = "";
+    const thead = document.createElement('thead');
+    const trh = document.createElement('tr');
+    trh.appendChild(cell('语言/年份','th'));
+    years.forEach(y => trh.appendChild(cell(String(y),'th')));
+    thead.appendChild(trh);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    languages.forEach((lang, li)=>{
+      const tr = document.createElement('tr');
+      tr.appendChild(cell(lang,'td'));
+      data[lang].forEach((v, yi)=>{
+        const td = cell(String(v),'td');
+        td.contentEditable = "true";
+        td.dataset.lang = lang;
+        td.dataset.yearIndex = yi;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+  }
+  function cell(text, tag){
+    const el = document.createElement(tag);
+    el.textContent = text;
+    return el;
+  }
+
+  // 图例
+  const legend = document.getElementById('legend');
+  function buildLegend(){
+    legend.innerHTML = "";
+    languages.forEach((lang,i)=>{
+      const item = document.createElement('div');
+      item.innerHTML = `<span class="dot" style="background:${palette[i%palette.length]}"></span>${lang}`;
+      legend.appendChild(item);
+    });
+  }
+
+  // 从表格读取数据
+  function readDataFromTable(){
+    const newData = {};
+    languages.forEach(lang => newData[lang] = new Array(years.length).fill(0));
+    table.querySelectorAll('td[contenteditable="true"]').forEach(td=>{
+      const lang = td.dataset.lang; const idx = +td.dataset.yearIndex;
+      const val = parseFloat(td.textContent.trim());
+      newData[lang][idx] = isFinite(val) ? val : 0;
+    });
+    return newData;
+  }
+
+  // 构建 3D 折线系列
+  function buildSeries(dataObj){
+    return languages.map((lang, yIdx) => ({
+      type: 'line3D',
+      name: lang,
+      data: years.map((y, xIdx) => [xIdx, yIdx, dataObj[lang][xIdx]]),
+      lineStyle: { width: 3, color: palette[yIdx%palette.length] },
+      itemStyle: { color: palette[yIdx%palette.length] },
+      symbolSize: 6,
+      shading: 'color',
+      emphasis: { lineStyle: { width: 5 } }
+    }));
+  }
+
+  // 初始化图表
+  const chart = echarts.init(document.getElementById('chart'));
+  function renderChart(dataObj){
+    const option = {
+      backgroundColor: 'transparent',
+      tooltip: {
+        formatter: (p)=>{
+          const [x,y,z] = p.value;
+          return `${languages[y]}<br/>年份：${years[x]}<br/>火热度：${z}`;
+        }
+      },
+      grid3D: {
+        boxWidth: 180, boxDepth: 100, boxHeight: 80,
+        viewControl: {
+          projection: 'perspective',
+          alpha: 28, beta: 25, distance: 280,
+          panMouseButton: 'left', rotateMouseButton: 'right'
+        },
+        light: {
+          main: { intensity: 1.1, shadow: false },
+          ambient: { intensity: 0.4 }
+        },
+        postEffect: { SSAO: { enable:true } },
+        axisPointer: { lineStyle: { color: '#8aa4ff' } }
+      },
+      xAxis3D: {
+        type: 'category',
+        data: years,
+        name: '年份',
+        nameTextStyle: { color: '#dbe4ff' },
+        axisLabel: { color: '#c9d6ff' }
+      },
+      yAxis3D: {
+        type: 'category',
+        data: languages,
+        name: '语言',
+        nameTextStyle: { color: '#dbe4ff' },
+        axisLabel: { color: '#c9d6ff' }
+      },
+      zAxis3D: {
+        type: 'value',
+        name: '火热度',
+        nameTextStyle: { color: '#dbe4ff' },
+        axisLabel: { color: '#c9d6ff' },
+        min: 0, max: 100
+      },
+      legend: {
+        top: 6, left: 6, textStyle: { color: '#e8eeff' },
+        data: languages
+      },
+      series: buildSeries(dataObj)
+    };
+    chart.setOption(option, true);
+  }
+
+  // 事件
+  document.getElementById('applyBtn').addEventListener('click', ()=>{
+    const d = readDataFromTable();
+    renderChart(d);
+  });
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    buildTable(sampleData);
+    renderChart(sampleData);
+  });
+  document.getElementById('downloadBtn').addEventListener('click', ()=>{
+    const url = chart.getDataURL({ pixelRatio: 2, backgroundColor: '#0b1020', type: 'png' });
+    const a = document.createElement('a');
+    a.href = url; a.download = 'lang-trend-3d.png'; a.click();
+  });
+
+  // 初始构建
+  buildLegend();
+  buildTable(sampleData);
+  renderChart(sampleData);
+  window.addEventListener('resize', ()=> chart.resize());
+</script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>编程语言热度趋势 (2014-2024)</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d); min-height: 100vh; display: flex; justify-content: center; align-items: center; color: white; }
+        .container { width: 90%; max-width: 1200px; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); padding: 30px; }
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { font-size: 2.8rem; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); margin-bottom: 10px; }
+        .subtitle { font-size: 1.2rem; opacity: 0.8; }
+        #chart { width: 100%; height: 70vh; }
+        .controls { display: flex; justify-content: center; gap: 15px; margin-top: 20px; flex-wrap: wrap; }
+        button { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 8px 16px; border-radius: 30px; cursor: pointer; transition: all 0.3s ease; }
+        button:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-2px); }
+        footer { text-align: center; margin-top: 30px; opacity: 0.7; font-size: 0.9rem; }
+        .data-table { margin-top: 30px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 15px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
+        th { background: rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>编程语言热度趋势分析</h1>
+            <p class="subtitle">2014-2024年度热度对比（基于市场影响力评估）</p>
+        </header>
+        <div id="chart"></div>
+        <div class="controls">
+            <button onclick="rotateView()">旋转视角</button>
+            <button onclick="toggleGrid()">切换网格</button>
+            <button onclick="resetView()">重置视图</button>
+        </div>
+        <div class="data-table">
+            <h3>原始数据表（可编辑）</h3>
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>年份</th>
+                        <th>C/C++</th>
+                        <th>Python</th>
+                        <th>Java</th>
+                        <th>PHP</th>
+                        <th>C#</th>
+                        <th>JavaScript</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>2014</td><td contenteditable="true">92</td><td contenteditable="true">78</td><td contenteditable="true">85</td><td contenteditable="true">76</td><td contenteditable="true">79</td><td contenteditable="true">82</td></tr>
+                    <tr><td>2015</td><td contenteditable="true">91</td><td contenteditable="true">85</td><td contenteditable="true">87</td><td contenteditable="true">74</td><td contenteditable="true">80</td><td contenteditable="true">88</td></tr>
+                    <tr><td>2016</td><td contenteditable="true">90</td><td contenteditable="true">92</td><td contenteditable="true">89</td><td contenteditable="true">72</td><td contenteditable="true">81</td><td contenteditable="true">95</td></tr>
+                    <tr><td>2017</td><td contenteditable="true">89</td><td contenteditable="true">98</td><td contenteditable="true">91</td><td contenteditable="true">70</td><td contenteditable="true">82</td><td contenteditable="true">100</td></tr>
+                    <tr><td>2018</td><td contenteditable="true">88</td><td contenteditable="true">100</td><td contenteditable="true">93</td><td contenteditable="true">68</td><td contenteditable="true">83</td><td contenteditable="true">105</td></tr><tr><td>2019</td><td contenteditable="true">87</td><td contenteditable="true">105</td><td contenteditable="true">95</td><td contenteditable="true">65</td><td contenteditable="true">84</td><td contenteditable="true">110</td></tr>
+                    <tr><td>2020</td><td contenteditable="true">86</td><td contenteditable="true">110</td><td contenteditable="true">97</td><td contenteditable="true">62</td><td contenteditable="true">85</td><td contenteditable="true">115</td></tr>
+                    <tr><td>2021</td><td contenteditable="true">85</td><td contenteditable="true">115</td><td contenteditable="true">99</td><td contenteditable="true">60</td><td contenteditable="true">86</td><td contenteditable="true">120</td></tr>
+                    <tr><td>2022</td><td contenteditable="true">84</td><td contenteditable="true">120</td><td contenteditable="true">101</td><td contenteditable="true">58</td><td contenteditable="true">87</td><td contenteditable="true">125</td></tr>
+                    <tr><td>2023</td><td contenteditable="true">83</td><td contenteditable="true">125</td><td contenteditable="true">103</td><td contenteditable="true">55</td><td contenteditable="true">88</td><td contenteditable="true">130</td></tr>
+                    <tr><td>2024</td><td contenteditable="true">82</td><td contenteditable="true">130</td><td contenteditable="true">105</td><td contenteditable="true">52</td><td contenteditable="true">89</td><td contenteditable="true">135</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <footer>数据来源：行业综合评估 | 可视化：ECharts 3D引擎</footer>
+    </div>
+
+    <script>
+        // 初始化数据
+        let datasets = {
+            'C/C++': [92,91,90,89,88,87,86,85,84,83,82],
+            'Python': [78,85,92,98,100,105,110,115,120,125,130],
+            'Java': [85,87,89,91,93,95,97,99,101,103,105],
+            'PHP': [76,74,72,70,68,65,62,60,58,55,52],
+            'C#': [79,80,81,82,83,84,85,86,87,88,89],
+            'JavaScript': [82,88,95,100,105,110,115,120,125,130,135]
+        };
+
+        // 获取DOM元素
+        const chartDom = document.getElementById('chart');
+        const myChart = echarts.init(chartDom);
+        const dataTable = document.getElementById('dataTable');
+
+        // 颜色方案
+        const colors = [
+            '#FF6B6B', // C/C++
+            '#4ECDC4', // Python
+            '#45B7D1', // Java
+            '#FED766', // PHP
+            '#A5D8DD', // C#
+            '#FF9F68'  // JavaScript
+        ];
+
+        // 配置项
+        const option = {
+            backgroundColor: 'transparent',
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { type: 'shadow' },
+                formatter: params => {
+                    return `${params[0].name}<br/>${params[0].seriesName}: ${params[0].value}`;
+                }
+            },
+            grid3D: {
+                viewControl: { alpha: 30, beta: 40, autoRotate: true },
+                light: { main: { intensity: 1.2 }, ambientCubemap: { textureCUBE: null } },
+                postEffect: { enable: true, bloom: { radius: 2 } }
+            },
+            xAxis3D: { type: 'category', data: ['2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'] },
+            yAxis3D: { type: 'value', name: '热度指数', min: 40, max: 140 },
+            zAxis3D: { type: 'value', name: '时间深度' },
+            series: Object.keys(datasets).map((lang, i) => ({
+                type: 'bar3D',
+                name: lang,
+                data: datasets[lang],
+                itemStyle: { color: colors[i] },
+                emphasis: { itemStyle: { color: colors[i].replace(')', ', opacity: 0.8)') } },
+                label: { show: true, position: 'top' },
+                barSize: 1.5,
+                stack: false
+            })),
+            animationDuration: 2000,
+            animationEasing: 'cubicOut'
+        };
+
+        // 应用配置
+        myChart.setOption(option);
+
+        // 交互控制函数
+        let rotationAngle = 0;
+        function rotateView() {
+            rotationAngle += 45;
+            myChart.setOption({
+                grid3D: {
+                    viewControl: { alpha: rotationAngle % 360, beta: 40 }
+                }
+            });
+        }
+
+        function toggleGrid() {
+            const currentShow = myChart.getOption().grid3D.show;
+            myChart.setOption({ grid3D: { show: !currentShow } });
+        }
+
+        function resetView() {
+            myChart.setOption({
+                grid3D: { viewControl: { alpha: 30, beta: 40 } }
+            });
+        }
+
+        // 窗口大小变化时自适应
+        window.addEventListener('resize', () => myChart.resize());
+
+        // 数据表编辑事件监听
+        dataTable.addEventListener('input', function(e) {
+            if (e.target.tagName === 'TD' && e.target.hasAttribute('contenteditable')) {
+                const rowIndex = e.target.parentElement.rowIndex - 1;
+                const colIndex = Array.from(e.target.parentElement.cells).indexOf(e.target);
+                const languageKeys = Object.keys(datasets);
+                const language = languageKeys[colIndex];
+                const newValue = parseInt(e.target.innerText) || 0;
+                
+                // 更新数据集
+                datasets[language][rowIndex] = newValue;
+                
+                // 更新图表
+                myChart.setOption({
+                    series: languageKeys.map((lang, i) => ({
+                        ...myChart.getOption().series[i],
+                        data: datasets[lang]
+                    }))
+                });
+            }
+        });
+    </script>
+</body>
+</html>
