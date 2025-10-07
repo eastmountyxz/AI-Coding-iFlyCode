@@ -1,0 +1,18 @@
+flowchart TD
+    Start([开始]) --> InitArray([初始化数组])
+    InitArray --> OuterLoopStart{"外层循环 i=0"}
+    OuterLoopStart --> SetSwappedFlag(["设置 swapped=0"])
+    SetSwappedFlag --> InnerLoopStart{"内层循环 j=0"}
+    InnerLoopStart --> CompareAdjacent(["比较 arr[j] 和 arr[j+1]"])
+    CompareAdjacent --> SwapElements([交换元素]):::condition1
+    CompareAdjacent --> IncrementJ([j++]):::condition2
+    UpdateSwappedFlag --> IncrementJ
+    IncrementJ -->|j < n-i-1| InnerLoopStart
+    InnerLoopStart --> InnerLoopEnd
+    InnerLoopEnd --> CheckSwapped([检查 swapped])
+    CheckSwapped --> IncrementI([i++]):::condition3
+    CheckSwapped --> EndProgram([结束]):::condition4
+    IncrementI -->|i < n-1| OuterLoopStart
+    IncrementI --> EndProgram
+    EndProgram --> PrintResult([输出排序结果])
+    PrintResult --> End([结束])
