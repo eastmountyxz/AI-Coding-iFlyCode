@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>编程语言年度热度趋势 (2014-2024)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-3d@1.0.0/dist/chartjs-plugin-3d.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; }
+        h1 { text-align: center; color: #2c3e50; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        #chart-container { position: relative; height: 80vh; width: 100%; }
+        .controls { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
+        button { padding: 8px 16px; border-radius: 20px; border: none; background: #3498db; color: white; cursor: pointer; transition: all 0.3s; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>编程语言年度热度指数 (2014 vs 2024)</h1>
+        <div id="chart-container">
+            <canvas id="popularityChart"></canvas>
+        </div>
+        <div class="controls">
+            <button onclick="resetView()">重置视角</button>
+            <button onclick="toggleAnimation()">切换动画</button>
+        </div>
+    </div>
+
+    <script>
+        // 加载数据
+        fetch('language_popularity.json')
+            .then(response => response.json())
+            .then(data => {
+                const years = Object.keys(data).sort();
+                const datasets = [];
+                
+                // 为每种语言创建独立数据集
+                for (const lang of Object.keys(data[years[0]])) {
+                    datasets.push({
+                        label: lang,
+                        data: years.map(y => data[y][lang]),
+                        backgroundColor: getGradientColor(lang),
+                        borderColor: darkenColor(getBaseColor(lang)),
+                        borderWidth: 1,
+                        pointRadius: function(context) { return context.raw > 80 ? 6 : 4; }, // 高分突出显示
+                        tension: 0.4 // 平滑曲线效果
+                    });
+                }
+
+                // 初始化图表配置
+                const config = {
+                    type: 'bar',
+                    data: { labels: years, datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { stacked: false },
+                            y: { beginAtZero: true, max: 100, title: { display: true, text: '热度指数' } }
+                        },
+                        plugins: {
+                            legend: { position: 'top', },
+                            tooltip: { callbacks: { afterLabel: addPercentage } },
+                            zoom: { pan: { enabled: true }, zoom: { wheel: { enabled: true } } }
+                        },
+                        animation: { duration: 1500 },
+                        onClick: handleBarClick // 点击交互处理函数
+                    }
+                };
+
+                // 启用3D效果插件
+                Chart.register(ChartDataLabels, ThreeDPlugin);
+                const chart = new Chart(document.getElementById('popularityChart'), config);
+                
+                // 全局变量存储状态
+                window.myChart = chart;
+            });
+
+        // 辅助函数：生成语言专属配色方案
+        function getBaseColor(langName) {
+            const hash = Array.from(langName).reduce((acc, char) => acc + char.charCodeAt(), 0);
+            return `hsl(${hash % 360}, 70%, 60%)`;
+        }
+        
+        function getGradientColor(langName) {
+            const baseHue = parseInt(getBaseColor(langName).match(/\d+/)[0]);
+            return [
+                `hsla(${baseHue}, 100%, 70%, 0.8)`,
+                `hsla(${(baseHue + 30) % 360}, 100%, 60%, 0.8)`,
+                `hsla(${(baseHue + 60) % 360}, 100%, 50%, 0.8)`
+            ];
+        }
+        
+        function darkenColor(rgbStr) {
+            // 简化实现：实际应用中应解析颜色值进行数学变换
+            return rgbStr.replace('hsl', 'hsl').replace('60%)', '40%)');
+        }
+
+        // Tooltip增强：显示同比变化百分比
+        function addPercentage(tooltipItem) {
+            const currentVal = tooltipItem.parsed.y;
+            const prevIndex = tooltipItem.index - 1;
+            const prevVal = tooltipItem.dataset.data[prevIndex];
+            const change = prevVal ? Math.round((currentVal - prevVal)/prevVal*100) : 'N/A';
+            return [`${tooltipItem.label}: ${currentVal}%`, `较去年 ${change}%`];
+        }
+
+        // 交互控制函数
+        function resetView() {
+            myChart.resetZoom();
+        }
+        
+        function toggleAnimation() {
+            myChart.options.animation.duration = myChart.options.animation.duration === 0 ? 1500 : 0;
+            myChart.update();
+        }
+        
+        function handleBarClick(event, elements) {
+            if (elements.length > 0) {
+                const index = elements[0].index;
+                alert(`选中年份: ${event.chartAreaMeta.data[index].label}\n最高语言: ${elements[0].datasetLabel}`);
+            }
+        }
+    </script>
+</body>
+</html>

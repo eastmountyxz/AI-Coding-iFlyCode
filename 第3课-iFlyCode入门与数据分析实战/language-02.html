@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>2014-2024年编程语言热度趋势（3D可视化）</title>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: 'Arial', sans-serif; }
+        #container { position: absolute; width: 100%; height: 100%; }
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        .legend-item { display: flex; align-items: center; margin: 5px 0; }
+        .color-box { width: 20px; height: 20px; margin-right: 10px; }
+        h1 { color: white; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+</head>
+<body>
+    <h1>2014-2024年编程语言热度指数（模拟数据）</h1>
+    <div id="container"></div>
+    <div id="controls">
+        <div class="legend-item">
+            <div class="color-box" style="background-color: #FF6B6B;"></div>
+            <span>C/C++</span>
+        </div>
+        <div class="legend-item">
+            <div class="color-box" style="background-color: #4ECDC4;"></div>
+            <span>Python</span>
+        </div>
+        <div class="legend-item">
+            <div class="color-box" style="background-color: #FFE66D;"></div>
+            <span>Java</span>
+        </div>
+        <div class="legend-item">
+            <div class="color-box" style="background-color: #A78BFA;"></div>
+            <span>PHP</span>
+        </div>
+        <div class="legend-item">
+            <div class="color-box" style="background-color: #F78FB3;"></div>
+            <span>C#</span>
+        </div>
+        <div class="legend-item">
+            <div class="color-box" style="background-color: #6BFFB8;"></div>
+            <span>JavaScript</span>
+        </div>
+    </div>
+
+    <script>
+        // ================= 内置数据集 =================
+        const yearRange = [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024];
+        const languages = [
+            { name: "C/C++", color: "#FF6B6B", values: [85,82,79,76,74,71,68,65,63,61,59] },
+            { name: "Python", color: "#4ECDC4", values: [65,70,75,80,85,90,95,100,105,110,115] },
+            { name: "Java", color: "#FFE66D", values: [90,88,86,84,82,80,78,76,74,72,70] },
+            { name: "PHP", color: "#A78BFA", values: [75,73,71,69,67,65,63,61,59,57,55] },
+            { name: "C#", color: "#F78FB3", values: [60,62,64,66,68,70,72,74,76,78,80] },
+            { name: "JavaScript", color: "#6BFFB8", values: [95,97,99,101,103,105,107,109,111,113,115] }
+        ];
+
+        // ================= Three.js初始化 =================
+        let scene, camera, renderer;
+        let bars = []; // 存储所有柱状图对象
+        
+        function init() {
+            // 创建场景
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf0f0f0);
+            
+            // 设置相机
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 30, 50);
+            camera.lookAt(0, 0, 0);
+            
+            // 创建渲染器
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('container').appendChild(renderer.domElement);
+            
+            // 添加光源
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+            
+            // 创建坐标轴辅助工具
+            const axesHelper = new THREE.AxesHelper(20);
+            scene.add(axesHelper);
+            
+            // 生成3D柱状图
+            createBarChart();
+            
+            // 添加事件监听
+            window.addEventListener('resize', onWindowResize);
+        }
+        
+        function createBarChart() {
+            const group = new THREE.Group();
+            const barWidth = 0.8;
+            const gap = 1.2; // 柱子之间的间隔
+            
+            // 根据年份数量计算总宽度以便居中显示
+            const totalWidth = (yearRange.length * gap) - gap;
+            const startX = -totalWidth / 2 + gap/2;
+            
+            // 为每种语言创建一组柱子
+            languages.forEach((lang, langIndex) => {
+                const offsetY = langIndex * 5 - 10; // 垂直方向上的偏移量
+                
+                yearRange.forEach((year, yearIdx) => {
+                    const xPos = startX + yearIdx * gap;
+                    const height = lang.values[yearIdx] / 5; // 缩放高度使图表更合理
+                    
+                    // 创建几何体和材质
+                    const geometry = new THREE.BoxGeometry(barWidth, height, barWidth);
+                    const material = new THREE.MeshPhongMaterial({ 
+                        color: new THREE.Color(lang.color),
+                        transparent: true,
+                        opacity: 0.9
+                    });
+                    
+                    const bar = new THREE.Mesh(geometry, material);
+                    bar.position.set(xPos, offsetY, 0);
+                    bar.userData = { language: lang.name, year: year, value: lang.values[yearIdx] };
+                    
+                    // 添加顶部标签
+                    addLabel(bar, `${lang.name}\n${year}`);
+                    
+                    group.add(bar);
+                    bars.push(bar);
+                });
+            });
+            
+            scene.add(group);
+        }
+        
+        function addLabel(mesh, text) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 256;
+            canvas.height = 128;
+            
+            context.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            
+            context.font = 'Bold 14px Arial';
+            context.fillStyle = '#000';
+            context.textAlign = 'center';
+            context.fillText(text, canvas.width/2, canvas.height/2);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.SpriteMaterial({ map: texture });
+            const sprite = new THREE.Sprite(material);
+            sprite.scale.set(5, 2.5, 1);
+            sprite.position.copy(mesh.position);
+            sprite.position.y += mesh.geometry.parameters.height / 2 + 2;
+            scene.add(sprite);
+        }
+        
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        // 动画循环
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // 缓慢旋转整个场景以获得更好的3D视角
+            scene.rotation.y += 0.005;
+            
+            renderer.render(scene, camera);
+        }
+        
+        // 启动应用
+        init();
+        animate();
+    </script>
+</body>
+</html>
