@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2014–2024 编程语言火热度 · 3D趋势图</title>
+  <script src="https://cdn.plot.ly/plotly-2.31.1.min.js"></script>
+  <style>
+    :root{
+      --bg:#0b1020;--card:#121a33;--text:#e8ecf6;--muted:#a8b3cf;--accent:#6ea8fe;--ok:#24d8a7;--warn:#f5b759;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#0b1020,#0b1020 60%,#0e1430);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif}
+    header{padding:28px 20px 10px;max-width:1200px;margin:0 auto}
+    h1{margin:0 0 6px;font-size:26px;letter-spacing:.4px}
+    p.lead{margin:4px 0 0;color:var(--muted)}
+    main{max-width:1200px;margin:16px auto;padding:0 20px 24px;display:grid;grid-template-columns:1.25fr .9fr;gap:16px}
+    @media (max-width:1080px){main{grid-template-columns:1fr;}}
+    .card{background:linear-gradient(180deg,#121a33,#0f1731);border:1px solid #1c2547;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .card h2{font-size:16px;font-weight:600;color:#dbe6ff;margin:0;padding:14px 16px;border-bottom:1px solid #202b56}
+    #chart{height:620px}
+    .pane{padding:14px 16px}
+    textarea{width:100%;min-height:360px;background:#0c132a;color:#eaf1ff;border:1px solid #223060;border-radius:10px;padding:12px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5}
+    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    button{appearance:none;border:none;background:#1d2a52;color:#eaf1ff;border:1px solid #2b3c73;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600;transition:.18s transform ease,.18s background ease}
+    button:hover{transform:translateY(-1px);background:#223060}
+    .ghost{background:transparent}
+    footer{max-width:1200px;margin:0 auto 24px;color:var(--muted);padding:0 20px}
+    code.k{background:#0c132a;border:1px solid #223060;border-radius:6px;padding:1px 6px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>2014–2024 编程语言火热度 · 三维趋势可视化</h1>
+    <p class="lead">内置可编辑数据（右侧面板）→ 点击 <span class="k"><code class="k">更新图表</code></span> 即可实时重绘。拖拽旋转、滚轮缩放以探索三维趋势。</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>3D 趋势图</h2>
+      <div id="chart"></div>
+    </section>
+
+    <aside class="card">
+      <h2>数据编辑（JSON）</h2>
+      <div class="pane">
+        <textarea id="editor" spellcheck="false"></textarea>
+        <div class="row">
+          <button id="updateBtn">更新图表</button>
+          <button id="resetBtn" class="ghost">恢复默认数据</button>
+          <button id="downloadBtn">下载为HTML</button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    <small>说明：火热度为0–100的相对指数，随时间变化用于展示整体趋势，非官方排名；图表基于 Plotly.js 渲染。</small>
+  </footer>
+
+  <script>
+    // —— 默认数据（2014—2024）的语言热度 ——
+    const defaultData = {
+      years: [2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],
+      series: [
+        { name: "Python", values: [40,45,50,55,60,68,75,80,85,88,90] },
+        { name: "JavaScript", values: [70,72,74,76,78,80,82,83,84,85,86] },
+        { name: "Java", values: [65,64,63,62,62,61,60,59,58,57,56] },
+        { name: "C/C++", values: [60,60,59,58,58,59,60,61,62,63,64] },
+        { name: "PHP", values: [55,53,50,47,44,40,36,33,30,28,26] },
+        { name: "C#", values: [50,50,51,52,53,55,57,58,60,61,62] }
+      ],
+      meta: {
+        unit: "热度指数(0-100)",
+        note: "示例趋势数据，可在右侧编辑并更新。"
+      }
+    };
+
+    const editor = document.getElementById('editor');
+    const chartEl = document.getElementById('chart');
+
+    function pretty(obj){ return JSON.stringify(obj, null, 2); }
+
+    function makeTraces(data){
+      const palette = [
+        '#5B8FF9','#5AD8A6','#5D7092','#F6BD16','#E8684A','#6DC8EC','#9270CA','#FF9D4D'
+      ];
+      const years = data.years;
+      return data.series.map((s, i) => ({
+        type: 'scatter3d',
+        mode: 'lines+markers',
+        name: s.name,
+        x: years,
+        y: Array(years.length).fill(s.name), // 将语言名作为Y轴类别
+        z: s.values,
+        line: { width: 6, color: palette[i % palette.length] },
+        marker: { size: 3.5, symbol: 'circle' },
+        hovertemplate: '<b>'+s.name+'</b><br>Year: %{x}<br>Index: %{z}<extra></extra>'
+      }));
+    }
+
+    function render(data){
+      const traces = makeTraces(data);
+      const layout = {
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        margin: { l: 0, r: 0, t: 6, b: 0 },
+        showlegend: true,
+        legend: { font: { color: '#dfe7ff' }, orientation: 'h', x: 0.02, y: 0.98 },
+        scene: {
+          xaxis: {
+            title: 'Year', gridcolor: '#2a3b6b', zerolinecolor: '#2a3b6b', color: '#cfe0ff',
+            tickvals: data.years, backgroundcolor: '#0c132a'
+          },
+          yaxis: {
+            title: 'Language', gridcolor: '#2a3b6b', zerolinecolor: '#2a3b6b', color: '#cfe0ff',
+            backgroundcolor: '#0c132a'
+          },
+          zaxis: {
+            title: data.meta?.unit || 'Index', gridcolor: '#2a3b6b', zerolinecolor: '#2a3b6b', color: '#cfe0ff',
+            range: [0, 100], backgroundcolor: '#0c132a'
+          },
+          camera: { eye: { x: 1.45, y: 1.75, z: 1.2 } },
+          aspectmode: 'cube'
+        },
+        annotations: [
+          { text: data.meta?.note || '', xref:'paper', yref:'paper', x:0, y: -0.08, showarrow:false, font:{color:'#a8b3cf', size:12}}
+        ]
+      };
+      Plotly.newPlot(chartEl, traces, layout, {displaylogo:false, responsive:true});
+    }
+
+    function isValidData(obj){
+      if(!obj || !Array.isArray(obj.years) || !Array.isArray(obj.series)) return false;
+      const n = obj.years.length;
+      return obj.series.every(s => Array.isArray(s.values) && s.values.length === n && typeof s.name === 'string');
+    }
+
+    function updateFromEditor(){
+      try {
+        const obj = JSON.parse(editor.value);
+        if(!isValidData(obj)) throw new Error('数据结构无效：请确保包含 years 数组与 series 数组，且每条 series.values 与 years 等长');
+        render(obj);
+      } catch(err){
+        alert('解析失败：'+ err.message);
+      }
+    }
+
+    function reset(){ editor.value = pretty(defaultData); render(defaultData); }
+
+    // 下载当前页面为自包含HTML
+    function downloadHTML(){
+      const currentData = editor.value;
+      const html = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>2014–2024 编程语言火热度 · 3D趋势图</title><script src="https://cdn.plot.ly/plotly-2.31.1.min.js"><\/script><style>${document.querySelector('style').innerHTML.replaceAll('</','<\/')}</style></head><body>${document.body.innerHTML.replaceAll('</','<\/')}<script>(function(){const data=${currentData};const chart=document.getElementById('chart');function makeTraces(d){const p=['#5B8FF9','#5AD8A6','#5D7092','#F6BD16','#E8684A','#6DC8EC','#9270CA','#FF9D4D'];return d.series.map((s,i)=>({type:'scatter3d',mode:'lines+markers',name:s.name,x:d.years,y:Array(d.years.length).fill(s.name),z:s.values,line:{width:6,color:p[i%p.length]},marker:{size:3.5,symbol:'circle'},hovertemplate:'<b>'+s.name+'</b><br>Year: %{x}<br>Index: %{z}<extra></extra>'}));}function render(d){Plotly.newPlot(chart,makeTraces(d),{paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',margin:{l:0,r:0,t:6,b:0},showlegend:true,legend:{font:{color:'#dfe7ff'},orientation:'h',x:0.02,y:0.98},scene:{xaxis:{title:'Year',gridcolor:'#2a3b6b',zerolinecolor:'#2a3b6b',color:'#cfe0ff',tickvals:d.years,backgroundcolor:'#0c132a'},yaxis:{title:'Language',gridcolor:'#2a3b6b',zerolinecolor:'#2a3b6b',color:'#cfe0ff',backgroundcolor:'#0c132a'},zaxis:{title:(d.meta&&d.meta.unit)||'Index',gridcolor:'#2a3b6b',zerolinecolor:'#2a3b6b',color:'#cfe0ff',range:[0,100],backgroundcolor:'#0c132a'},camera:{eye:{x:1.45,y:1.75,z:1.2}},aspectmode:'cube'},annotations:[{text:(d.meta&&d.meta.note)||'',xref:'paper',yref:'paper',x:0,y:-0.08,showarrow:false,font:{color:'#a8b3cf',size:12}}]}, {displaylogo:false,responsive:true});}render(data);document.getElementById('updateBtn').onclick=function(){try{const obj=JSON.parse(document.getElementById('editor').value);if(!obj||!Array.isArray(obj.years)||!Array.isArray(obj.series)||!obj.series.every(s=>Array.isArray(s.values)&&s.values.length===obj.years.length&&typeof s.name==='string'))throw new Error('数据结构无效');render(obj);}catch(e){alert('解析失败：'+e.message)}};document.getElementById('resetBtn').onclick=function(){document.getElementById('editor').value=JSON.stringify(${JSON.stringify(defaultData)},null,2);render(${JSON.stringify(defaultData)})};})();<\/script></body></html>`;
+      const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'language-trend-3d-2014-2024.html';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    document.getElementById('updateBtn').addEventListener('click', updateFromEditor);
+    document.getElementById('resetBtn').addEventListener('click', reset);
+    document.getElementById('downloadBtn').addEventListener('click', downloadHTML);
+
+    // 初始化
+    reset();
+  </script>
+</body>
+</html>
