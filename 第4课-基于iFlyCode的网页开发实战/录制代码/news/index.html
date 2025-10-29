@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国新闻热搜榜 - 实时追踪热点事件</title>
+    <meta name="description" content="权威的中国新闻热搜排行榜，聚合全网热点资讯">
+    <meta property="og:title" content="中国新闻热搜榜">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://example.com">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <!-- 头部区域 -->
+    <header class="header">
+        <div class="container">
+            <img src="https://via.placeholder.com/180x60?text=新闻热搜榜LOGO" alt="新闻热搜榜LOGO" class="logo">
+            <div class="search-box">
+                <input type="text" placeholder="输入关键词搜索..." aria-label="搜索新闻">
+                <button class="search-btn">搜索</button>
+            </div>
+            <button class="contribute-btn" id="openContribution">投稿/纠错</button>
+            <div class="theme-toggle" aria-label="切换主题">🌙</div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="main-content container">
+        <!-- 热榜列表 -->
+        <section class="hotlist-section">
+            <h2 class="section-title">今日热榜 <span class="sort-info">按热度排序 ↓</span></h2>
+            <div class="sort-controls">
+                <button class="sort-btn active" data-sort="hot">按热度</button>
+                <button class="sort-btn" data-sort="time">按时间</button>
+            </div>
+            <div class="news-list" id="newsList"></div>
+            <div class="pagination">
+                <button class="page-btn prev" disabled>上一页</button>
+                <span class="page-info">第1页/共4页</span>
+                <button class="page-btn next">下一页</button>
+            </div>
+        </section>
+
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="widget wordcloud">
+                <h3>热点词云</h3>
+                <div class="tags">
+                    <span class="tag">经济</span>
+                    <span class="tag">科技</span>
+                    <span class="tag">社会</span>
+                    <span class="tag">国际</span>
+                    <span class="tag">体育</span>
+                    <span class="tag">娱乐</span>
+                </div>
+            </div>
+            <div class="widget categories">
+                <h3>分类筛选</h3>
+                <select class="category-filter">
+                    <option value="all">全部分类</option>
+                    <option value="politics">政治</option>
+                    <option value="business">财经</option>
+                    <option value="tech">科技</option>
+                    <option value="entertainment">娱乐</option>
+                </select>
+            </div>
+            <div class="back-to-top" title="返回顶部" aria-hidden="true">↑</div>
+        </aside>
+    </main>
+
+    <!-- 底部版权 -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 202X 新闻热搜榜 版权所有 | <a href="#">备案号：京ICP备XXXXXXXX号</a></p>
+        </div>
+    </footer>
+
+    <!-- 投稿表单模态框 -->
+    <div class="modal" id="contributionModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>投稿/纠错</h2>
+            <form id="contributionForm">
+                <div class="form-group">
+                    <label for="title">标题*</label>
+                    <input type="text" id="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="url">原文链接*</label>
+                    <input type="url" id="url" required pattern="https?://[^\s]+">
+                    <small class="error-msg" id="urlError"></small>
+                </div>
+                <div class="form-group">
+                    <label for="source">来源*</label>
+                    <input type="text" id="source" required>
+                </div>
+                <div class="form-group">
+                    <label for="summary">摘要</label>
+                    <textarea id="summary" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="email">联系邮箱*</label>
+                    <input type="email" id="email" required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}">
+                    <small class="error-msg" id="emailError"></small>
+                </div>
+                <div class="form-group">
+                    <label for="image">上传图片</label>
+                    <input type="file" id="image" accept="image/*">
+                </div>
+                <div class="form-actions">
+                    <button type="reset" class="btn secondary">重置</button>
+                    <button type="submit" class="btn primary">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
