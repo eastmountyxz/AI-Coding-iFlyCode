@@ -1,0 +1,78 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="中国新闻热搜榜 - 实时追踪全网热点事件">
+    <meta property="og:title" content="中国新闻热搜榜">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://example.com/og-image.jpg">
+    <link rel="stylesheet" href="styles.css">
+    <title>中国新闻热搜榜</title>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🔥%3C/text%3E%3C/svg%3E" 
+                 alt="新闻热搜榜" class="logo" aria-label="网站Logo">
+            <div class="search-box">
+                <input type="text" placeholder="搜索热点..." aria-label="搜索框" id="searchInput">
+                <button aria-label="搜索按钮">🔍</button>
+            </div>
+            <button class="theme-toggle" aria-label="切换主题">🌓</button>
+        </div>
+    </header>
+
+    <main class="container main-content">
+        <section class="hot-list">
+            <div class="list-header">
+                <h2>今日热榜</h2>
+                <div class="sort-controls">
+                    <button class="sort-btn active" data-sort="hot">🔥 按热度</button>
+                    <button class="sort-btn" data-sort="time">⏳ 按时间</button>
+                </div>
+            </div>
+            
+            <div class="list-container" id="hotList"></div>
+            
+            <div class="pagination">
+                <button class="page-btn prev" disabled>上一页</button>
+                <span class="page-info">1/2</span>
+                <button class="page-btn next">下一页</button>
+            </div>
+        </section>
+
+        <aside class="sidebar">
+            <div class="wordcloud">
+                <h3>热点词云</h3>
+                <div class="tags">
+                    <span class="tag">两会</span>
+                    <span class="tag">航天</span>
+                    <span class="tag">人工智能</span>
+                    <!-- 更多标签... -->
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="copyright">© 2024 中国新闻热搜榜 京ICP备12345678号</div>
+            <button class="feedback-btn" id="openForm">投稿/纠错</button>
+        </div>
+    </footer>
+
+    <!-- 投稿模态框 -->
+    <div class="modal" id="submitModal">
+        <div class="modal-content">
+            <form id="submitForm" novalidate>
+                <h2>新闻投稿/纠错</h2>
+                <!-- 表单字段... -->
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
