@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI性格测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .question-container {
+            min-height: 300px;
+            position: relative;
+        }
+
+        .question {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option-btn {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+
+        .option-btn:hover {
+            border-color: #4CAF50;
+            background: #f8fff8;
+        }
+
+        .option-btn.selected {
+            border-color: #4CAF50;
+            background: #e8f5e9;
+        }
+
+        .nav-buttons {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #4CAF50;
+            color: white;
+            transition: opacity 0.3s;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .result-container {
+            display: none;
+            text-align: center;
+        }
+
+        .mbti-type {
+            font-size: 2.5em;
+            color: #4CAF50;
+            margin: 20px 0;
+        }
+
+        .chart-container {
+            max-width: 600px;
+            margin: 30px auto;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            .question {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="question-container">
+            <div class="question"></div>
+            <div class="options"></div>
+            <div class="nav-buttons">
+                <button id="prevBtn" onclick="prevQuestion()" disabled>上一题</button>
+                <span id="progress">1/20</span>
+                <button id="nextBtn" onclick="nextQuestion()" disabled>下一题</button>
+            </div>
+        </div>
+        
+        <div class="result-container">
+            <h2>你的性格类型是：<span class="mbti-type"></span></h2>
+            <div class="chart-container">
+                <canvas id="resultChart"></canvas>
+            </div>
+            <div class="type-description"></div>
+        </div>
+    </div>
+
+    <script>
+        // MBTI题库
+        const questions = [
+            {
+                question: "你更喜欢哪种社交方式？",
+                options: [
+                    { text: "参加聚会活动（E）", dimension: "E" },
+                    { text: "一对一深度交流（I）", dimension: "I" }
+                ]
+            },
+            // 此处省略18道题示例，实际使用需补全
+            {
+                question: "你更倾向于如何做决定？",
+                options: [
+                    { text: "基于客观分析（T）", dimension: "T" },
+                    { text: "考虑他人感受（F）", dimension: "F" }
+                ]
+            }
+        ];
+
+        // 状态管理
+        let currentQuestion = 0;
+        let answers = [];
+        const scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
+
+        // 初始化题目
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            document.querySelector('.question').textContent = q.question;
+            
+            const optionsDiv = document.querySelector('.options');
+            optionsDiv.innerHTML = q.options.map((opt, index) => `
+                <button class="option-btn" 
+                    onclick="selectOption(${index})"
+                    ${answers[currentQuestion] === index ? 'class="selected"' : ''}>
+                    ${opt.text}
+                </button>
+            `).join('');
+            
+            document.getElementById('progress').textContent = `${currentQuestion+1}/${questions.length}`;
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+        }
+
+        // 选项选择
+        function selectOption(optionIndex) {
+            answers[currentQuestion] = optionIndex;
+            document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        // 导航控制
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+            } else {
+                calculateResult();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+            }
+        }
+
+        // 计算结果
+        function calculateResult() {
+            // 分数计算逻辑
+            answers.forEach((ansIdx, qIdx) => {
+                const dimension = questions[qIdx].options[ansIdx].dimension;
+                scores[dimension]++;
+            });
+
+            // 确定MBTI类型
+            const mbti = [
+                scores.E > scores.I ? 'E' : 'I',
+                scores.S > scores.N ? 'S' : 'N',
+                scores.T > scores.F ? 'T' : 'F',
+                scores.J > scores.P ? 'J' : 'P'
+            ].join('');
+
+            // 显示结果
+            document.querySelector('.question-container').style.display = 'none';
+            document.querySelector('.result-container').style.display = 'block';
+            document.querySelector('.mbti-type').textContent = mbti;
+            
+            // 绘制图表（需补充Canvas绘制逻辑）
+            renderChart();
+        }
+
+        // 初始化
+        renderQuestion();
+    </script>
+</body>
+</html>
