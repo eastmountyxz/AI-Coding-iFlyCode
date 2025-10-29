@@ -1,0 +1,57 @@
+/* styles.css */
+:root {
+    --primary-color: #c00;
+    --bg-color: #fff;
+    --text-color: #333;
+    --card-bg: #fff;
+    --border-color: #eee;
+}
+
+[data-theme="dark"] {
+    --bg-color: #1a1a1a;
+    --text-color: #eee;
+    --card-bg: #2d2d2d;
+    --border-color: #444;
+}
+
+/* 基础样式 */
+body {
+    font-family: "Microsoft YaHei", sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* 热榜卡片样式 */
+.hot-item {
+    background: var(--card-bg);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: transform 0.3s ease;
+    display: grid;
+    grid-template-columns: 50px 1fr 120px;
+    gap: 15px;
+}
+
+.hot-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .hot-item {
+        grid-template-columns: 1fr;
+    }
+}
