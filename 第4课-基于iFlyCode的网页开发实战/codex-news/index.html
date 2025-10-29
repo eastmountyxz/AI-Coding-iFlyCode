@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>中国新闻热搜榜 - 今日热榜</title>
+  <meta name="description" content="中国新闻热搜榜，实时了解今日最热新闻、热点词云与分类筛选，以及投稿纠错入口。" />
+  <meta name="keywords" content="中国, 新闻, 热搜, 热榜, 今日新闻, 热点词云" />
+  <meta property="og:title" content="中国新闻热搜榜" />
+  <meta property="og:description" content="查看中国新闻今日热榜，掌握即时热点，欢迎投稿与纠错。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://example.com/news-hotlist" />
+  <meta property="og:image" content="https://via.placeholder.com/1200x630" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <div class="logo" aria-label="中国新闻热搜榜 Logo">中国新闻热搜榜</div>
+    <form class="search-form" role="search" aria-label="站内搜索">
+      <label for="searchInput" class="sr-only">搜索热点</label>
+      <input type="search" id="searchInput" placeholder="搜索热点新闻" aria-label="搜索热点新闻" />
+      <button type="submit" aria-label="执行搜索">搜索</button>
+    </form>
+    <div class="header-actions">
+      <button id="themeToggle" type="button" aria-pressed="false" aria-label="切换深浅色模式">🌗</button>
+      <button id="openForm" type="button" class="primary-btn" aria-haspopup="dialog" aria-controls="submissionModal">投稿 / 纠错</button>
+    </div>
+  </header>
+
+  <main class="layout" role="main">
+    <section class="hotlist" aria-labelledby="hotlistTitle">
+      <div class="section-header">
+        <h1 id="hotlistTitle">今日热榜</h1>
+        <div class="controls" aria-label="排序与分页控制">
+          <label for="sortSelect">排序：</label>
+          <select id="sortSelect" aria-label="热榜排序">
+            <option value="heat">按热度</option>
+            <option value="time">按时间</option>
+          </select>
+          <div class="pagination" role="navigation" aria-label="分页">
+            <button id="prevPage" type="button" aria-label="上一页">上一页</button>
+            <span id="paginationInfo" aria-live="polite"></span>
+            <button id="nextPage" type="button" aria-label="下一页">下一页</button>
+          </div>
+        </div>
+      </div>
+      <ul class="hotlist-items" id="hotlistItems" aria-live="polite"></ul>
+    </section>
+
+    <aside class="sidebar" aria-labelledby="sidebarTitle">
+      <h2 id="sidebarTitle">热点词云 / 分类筛选</h2>
+      <div class="word-cloud" role="list">
+        <span role="listitem" class="tag tag-large">科技</span>
+        <span role="listitem" class="tag tag-medium">经济</span>
+        <span role="listitem" class="tag tag-small">教育</span>
+        <span role="listitem" class="tag tag-medium">社会</span>
+        <span role="listitem" class="tag tag-large">民生</span>
+        <span role="listitem" class="tag tag-small">文娱</span>
+        <span role="listitem" class="tag tag-medium">体育</span>
+        <span role="listitem" class="tag tag-small">国际</span>
+        <span role="listitem" class="tag tag-medium">健康</span>
+      </div>
+      <div class="filters" aria-label="分类筛选">
+        <button type="button" class="filter-btn" data-filter="全部">全部</button>
+        <button type="button" class="filter-btn" data-filter="科技">科技</button>
+        <button type="button" class="filter-btn" data-filter="经济">经济</button>
+        <button type="button" class="filter-btn" data-filter="社会">社会</button>
+        <button type="button" class="filter-btn" data-filter="文娱">文娱</button>
+      </div>
+    </aside>
+  </main>
+
+  <button id="backToTop" class="back-to-top" aria-label="返回顶部">⤴</button>
+
+  <footer class="site-footer" role="contentinfo">
+    <p>© 2024 中国新闻热搜榜 | 版权所有</p>
+    <p>ICP备案号：京ICP备20240001号-1 | 举报邮箱：report@example.com</p>
+  </footer>
+
+  <div id="submissionModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-content" role="document">
+      <button type="button" class="modal-close" aria-label="关闭投稿表单">×</button>
+      <h2 id="modalTitle">投稿 / 纠错</h2>
+      <form id="submissionForm" novalidate>
+        <div class="form-group">
+          <label for="newsTitle">标题 *</label>
+          <input type="text" id="newsTitle" name="newsTitle" required aria-required="true" />
+          <span class="error" id="titleError" role="alert"></span>
+        </div>
+        <div class="form-group">
+          <label for="newsLink">链接 *</label>
+          <input type="url" id="newsLink" name="newsLink" required aria-required="true" placeholder="https://example.com" />
+          <span class="error" id="linkError" role="alert"></span>
+        </div>
+        <div class="form-group">
+          <label for="newsSource">来源 *</label>
+          <input type="text" id="newsSource" name="newsSource" required aria-required="true" />
+          <span class="error" id="sourceError" role="alert"></span>
+        </div>
+        <div class="form-group">
+          <label for="newsSummary">摘要 *</label>
+          <textarea id="newsSummary" name="newsSummary" required aria-required="true" rows="3"></textarea>
+          <span class="error" id="summaryError" role="alert"></span>
+        </div>
+        <div class="form-group">
+          <label for="email">邮箱 *</label>
+          <input type="email" id="email" name="email" required aria-required="true" placeholder="you@example.com" />
+          <span class="error" id="emailError" role="alert"></span>
+        </div>
+        <div class="form-group">
+          <label for="imageUpload">上传图片</label>
+          <input type="file" id="imageUpload" name="imageUpload" accept="image/*" />
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="primary-btn">提交</button>
+          <button type="reset">重置</button>
+        </div>
+        <p class="form-success" id="formSuccess" role="status" aria-live="polite" hidden>提交成功，感谢您的贡献！</p>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
