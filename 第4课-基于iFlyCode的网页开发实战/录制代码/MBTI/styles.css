@@ -1,0 +1,147 @@
+/* 基础样式 */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 600px;
+    width: 90%;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+/* 进度条 */
+.progress-container {
+    width: 100%;
+    height: 8px;
+    background-color: #ecf0f1;
+    border-radius: 4px;
+    margin-bottom: 30px;
+}
+
+#progress-bar {
+    height: 100%;
+    width: 0%;
+    background-color: #3498db;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* 题目卡片 */
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+#question-text {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+/* 选项按钮 */
+.options {
+    display: flex;
+    gap: 15px;
+}
+
+.option-btn {
+    flex: 1;
+    padding: 12px;
+    font-size: 1em;
+    border: none;
+    border-radius: 6px;
+    background-color: #3498db;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.option-btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+/* 导航按钮 */
+.navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+#prev-btn, #next-btn {
+    padding: 10px 20px;
+    font-size: 1em;
+    border: none;
+    border-radius: 6px;
+    background-color: #95a5a6;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#prev-btn:hover, #next-btn:hover {
+    background-color: #7f8c8d;
+}
+
+#next-btn:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}
+
+/* 结果区域 */
+#result-area {
+    text-align: center;
+}
+
+#mbti-type {
+    font-size: 1.5em;
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+#personality-description {
+    margin: 20px 0;
+    text-align: left;
+    line-height: 1.6;
+}
+
+/* 隐藏类 */
+.hidden {
+    display: none !important;
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+    .container {
+        width: 95%;
+        padding: 15px;
+    }
+    
+    .options {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .option-btn {
+        width: 100%;
+    }
+}
