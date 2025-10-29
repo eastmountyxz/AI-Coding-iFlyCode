@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课堂互动抽奖系统</title>
+    <style>
+        /* 基础样式设置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        /* 转盘容器样式 */
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 30px auto;
+        }
+        
+        @media (min-width: 768px) {
+            .wheel-container {
+                width: 400px;
+                height: 400px;
+            }
+        }
+        
+        /* 转盘样式 */
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            border: 8px solid #333;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            transform: rotate(0deg);
+            background-color: #fff;
+        }
+        
+        /* 转盘指针样式 */
+        .pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #ff4757;
+            z-index: 10;
+        }
+        
+        /* 转盘扇形区域样式 */
+        .wheel-section {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%;
+            left: 0;
+            top: 0;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        /* 学生名字样式 */
+        .student-name {
+            position: absolute;
+            width: 100px;
+            text-align: center;
+            font-weight: bold;
+            transform-origin: 0 0;
+            left: 100%;
+            top: 0;
+            transform: rotate(90deg) translateY(-20px);
+            font-size: 14px;
+            color: #333;
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            padding: 12px 30px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 20px 0;
+        }
+        
+        .btn:hover {
+            background-color: #45a049;
+        }
+        
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        /* 结果显示区样式 */
+        .result-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result-title {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .winner {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff4757;
+            text-align: center;
+            margin: 10px 0;
+            min-height: 36px;
+        }
+        
+        .history-title {
+            font-size: 16px;
+            color: #666;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .history-list {
+            list-style-type: none;
+            max-height: 200px;
+            overflow-y: auto;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+        
+        .history-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 480px) {
+            .wheel-container {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .student-name {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>课堂互动抽奖系统</h1>
+    
+    <!-- 转盘区域 -->
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        <div class="wheel" id="wheel"></div>
+    </div>
+    
+    <!-- 操作按钮 -->
+    <button class="btn" id="startBtn">开始抽奖</button>
+    
+    <!-- 结果显示区 -->
+    <div class="result-container">
+        <div class="result-title">中奖学生</div>
+        <div class="winner" id="winner"></div>
+        
+        <div class="history-title">已中奖名单</div>
+        <ul class="history-list" id="historyList"></ul>
+    </div>
+
+    <script>
+        // 学生名单数组
+        const students = [
+            "张三", "李四", "王五", "赵六", "钱七", 
+            "孙八", "周九", "吴十", "郑十一", "王十二",
+            "冯十三", "陈十四", "褚十五", "卫十六", "蒋十七",
+            "沈十八", "韩十九", "杨二十", "朱二一", "秦二二"
+        ];
+        
+        // 剩余学生名单（用于抽奖，避免重复）
+        let remainingStudents = [...students];
+        // 中奖学生名单
+        let winners = [];
+        // 是否正在抽奖
+        let isSpinning = false;
+        
+        // 获取DOM元素
+        const wheel = document.getElementById('wheel');
+        const startBtn = document.getElementById('startBtn');
+        const winnerDisplay = document.getElementById('winner');
+        const historyList = document.getElementById('historyList');
+        
+        // 初始化转盘
+        function initWheel() {
+            // 清空转盘
+            wheel.innerHTML = '';
+            
+            // 计算每个扇形的角度
+            const angle = 360 / students.length;
+            
+            // 创建扇形区域和学生名字
+            students.forEach((student, index) => {
+                // 创建扇形区域
+                const section = document.createElement('div');
+                section.className = 'wheel-section';
+                section.style.transform = `rotate(${index * angle}deg)`;
+                
+                // 设置交替颜色
+                if (index % 2 === 0) {
+                    section.style.backgroundColor = '#f8f9fa';
+                } else {
+                    section.style.backgroundColor = '#e9ecef';
+                }
+                
+                // 创建学生名字
+                const nameElement = document.createElement('div');
+                nameElement.className = 'student-name';
+                nameElement.textContent = student;
+                
+                // 将名字添加到扇形区域
+                section.appendChild(nameElement);
+                
+                // 将扇形区域添加到转盘
+                wheel.appendChild(section);
+            });
+        }
+        
+        // 开始抽奖
+        function startLottery() {
+            // 如果正在抽奖或没有剩余学生，则返回
+            if (isSpinning || remainingStudents.length === 0) return;
+            
+            // 设置状态为正在抽奖
+            isSpinning = true;
+            startBtn.disabled = true;
+            winnerDisplay.textContent = '';
+            
+            // 随机选择中奖者
+            const randomIndex = Math.floor(Math.random() * remainingStudents.length);
+            const winner = remainingStudents[randomIndex];
+            
+            // 计算停止角度（确保指针指向中奖者）
+            const winnerIndex = students.indexOf(winner);
+            const anglePerSection = 360 / students.length;
+            const targetAngle = 360 * 5 + (360 - (winnerIndex * anglePerSection + anglePerSection / 2));
+            
+            // 应用旋转动画
+            wheel.style.transform = `rotate(${targetAngle}deg)`;
+            
+            // 旋转结束后处理
+            setTimeout(() => {
+                // 更新中奖者显示
+                winnerDisplay.textContent = winner;
+                
+                // 添加到中奖名单
+                winners.push(winner);
+                
+                // 更新历史记录
+                updateHistory();
+                
+                // 从剩余学生中移除
+                remainingStudents.splice(randomIndex, 1);
+                
+                // 重置状态
+                isSpinning = false;
+                
+                // 如果没有剩余学生，禁用按钮
+                if (remainingStudents.length === 0) {
+                    startBtn.textContent = '抽奖结束';
+                } else {
+                    startBtn.disabled = false;
+                }
+            }, 5000);
+        }
+        
+        // 更新历史记录
+        function updateHistory() {
+            historyList.innerHTML = '';
+            winners.forEach((winner, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${index + 1}. ${winner}`;
+                historyList.appendChild(li);
+            });
+        }
+        
+        // 事件监听
+        startBtn.addEventListener('click', startLottery);
+        
+        // 初始化转盘
+        initWheel();
+    </script>
+</body>
+</html>
