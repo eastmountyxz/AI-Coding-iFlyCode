@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课堂互动抽奖系统</title>
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* 转盘区域样式 */
+        .wheel-container {
+            position: relative;
+            width: 90vw;
+            max-width: 500px;
+            aspect-ratio: 1/1;
+            margin-bottom: 30px;
+        }
+        
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: white;
+            border: 8px solid #3498db;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 5s cubic-bezier(0.17, 0.67, 0.83, 0.67); /* 平滑的减速效果 */
+        }
+        
+        .segment {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: bottom right;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #2c3e50;
+            text-align: center;
+            padding: 5px;
+        }
+        
+        /* 按钮区域样式 */
+        .button-area {
+            margin: 20px 0;
+        }
+        
+        #startBtn {
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        #startBtn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        
+        #startBtn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* 结果显示区域样式 */
+        .result-area {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        #resultText {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e74c3c;
+            padding: 15px 30px;
+            background-color: rgba(255,255,255,0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .wheel-container {
+                width: 95vw;
+            }
+            
+            #resultText {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 课堂互动抽奖系统 🎉</h1>
+        
+        <!-- 转盘区域 -->
+        <div class="wheel-container">
+            <div id="wheel" class="wheel"></div>
+        </div>
+        
+        <!-- 操作按钮区 -->
+        <div class="button-area">
+            <button id="startBtn">开始抽奖</button>
+        </div>
+        
+        <!-- 结果显示区 -->
+        <div class="result-area">
+            <div id="resultText">等待抽奖...</div>
+        </div>
+    </div>
+
+    <script>
+        // 学生名单数组（共20人）
+        const students = [
+            "张三", "李四", "王五", "赵六", "钱七", "孙八", "周九", "吴十",
+            "郑十一", "王十二", "冯十三", "陈十四", "褚十五", "卫十六", "蒋十七", "沈十八",
+            "韩十九", "杨二十", "朱二一", "秦二二"
+        ];
+        
+        // 获取DOM元素
+        const wheel = document.getElementById('wheel');
+        const startBtn = document.getElementById('startBtn');
+        const resultText = document.getElementById('resultText');
+        
+        // 当前可用的学生列表（初始为全部学生）
+        let availableStudents = [...students];
+        
+        // 初始化转盘扇区
+        function initWheel() {
+            wheel.innerHTML = ''; // 清空现有内容
+            
+            const count = availableStudents.length;
+            const angleStep = 360 / count; // 每个扇区的角度间隔
+            
+            for (let i = 0; i < count; i++) {
+                const segment = document.createElement('div');
+                segment.className = 'segment';
+                
+                // 计算旋转角度使文本朝外显示
+                const rotateAngle = i * angleStep + angleStep / 2;
+                segment.style.transform = `rotate(${rotateAngle}deg)`;
+                
+                // 设置背景色交替变化以便区分不同扇区
+                const hue = (i * 30) % 360; // 使用HSL色彩模型创建彩虹效果
+                segment.style.backgroundColor = `hsl(${hue}, 70%, 85%)`;
+                
+                // 添加学生姓名到扇区内
+                const studentName = document.createElement('span');
+                studentName.textContent = availableStudents[i];
+                studentName.style.transform = `rotate(${-rotateAngle}deg)`; // 反向旋转保持文字正向
+                segment.appendChild(studentName);
+                
+                wheel.appendChild(segment);
+            }
+        }
+        
+        // 开始抽奖函数
+        function startLottery() {
+            // 如果已经没有剩余学生可抽，则禁用按钮并提示
+            if (availableStudents.length === 0) {
+                resultText.textContent = "所有同学都已中奖！";
+                startBtn.disabled = true;
+                return;
+            }
+            
+            // 禁用按钮防止重复点击
+            startBtn.disabled = true;
+            resultText.textContent = "抽奖中...";
+            
+            // 随机决定停止的位置（对应哪个学生会被选中）
+            const randomIndex = Math.floor(Math.random() * availableStudents.length);
+            const winner = availableStudents[randomIndex];
+            
+            // 计算需要旋转的总圈数+偏移量以确保停在正确位置
+            // 基础旋转圈数（至少3圈保证视觉效果）+ 根据所选索引调整最终位置
+            const baseRotations = 3; // 至少转3圈
+            const targetRotation = baseRotations * 360 + (360 - (randomIndex * (360 / availableStudents.length)));
+            
+            // 应用CSS动画使转盘旋转到目标角度
+            wheel.style.transform = `rotate(${targetRotation}deg)`;
+            
+            // 5秒后显示结果（与CSS动画持续时间匹配）
+            setTimeout(() => {
+                // 从可用列表中移除已中奖的学生
+                availableStudents.splice(randomIndex, 1);
+                
+                // 更新结果显示区
+                resultText.innerHTML = `✅ ${winner}`;
+                
+                // 重新渲染转盘以反映剩余的学生
+                initWheel();
+                
+                // 如果还有剩余学生，则重新启用按钮
+                if (availableStudents.length > 0) {
+                    startBtn.disabled = false;
+                } else {
+                    resultText.textContent = "所有同学都已中奖！";
+                }
+            }, 5000); // 5秒延迟与CSS动画持续时间一致
+        }
+        
+        // 绑定按钮点击事件
+        startBtn.addEventListener('click', startLottery);
+        
+        // 页面加载时初始化转盘
+        window.onload = initWheel;
+    </script>
+</body>
+</html>
