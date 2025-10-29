@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="中国新闻热搜榜 - 实时追踪全网热点新闻">
+    <meta name="keywords" content="新闻,热搜,热点,中国新闻,热榜">
+    <meta property="og:title" content="中国新闻热搜榜">
+    <meta property="og:description" content="实时追踪全网热点新闻">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://example.com">
+    <meta property="og:image" content="https://example.com/images/og-image.jpg">
+    <title>中国新闻热搜榜</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo-search">
+                <div class="logo">
+                    <img src="https://via.placeholder.com/150x50?text=中国新闻热搜榜" alt="中国新闻热搜榜Logo">
+                </div>
+                <div class="search-box">
+                    <input type="text" placeholder="搜索新闻..." aria-label="搜索新闻">
+                    <button><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main container">
+        <div class="content">
+            <section class="hot-news">
+                <div class="section-header">
+                    <h1>今日热榜</h1>
+                    <div class="sort-options">
+                        <button class="sort-btn active" data-sort="hot">按热度</button>
+                        <button class="sort-btn" data-sort="time">按时间</button>
+                    </div>
+                </div>
+                
+                <div class="news-list" id="newsList">
+                    <!-- 新闻列表将通过JavaScript动态生成 -->
+                </div>
+                
+                <div class="pagination">
+                    <button class="prev-btn" disabled><i class="fas fa-chevron-left"></i> 上一页</button>
+                    <div class="page-numbers"></div>
+                    <button class="next-btn">下一页 <i class="fas fa-chevron-right"></i></button>
+                </div>
+            </section>
+            
+            <button class="submit-news-btn" id="submitNewsBtn">投稿/纠错</button>
+        </div>
+        
+        <aside class="sidebar">
+            <div class="widget">
+                <h2>热点词云</h2>
+                <div class="word-cloud">
+                    <span class="word-large">疫情</span>
+                    <span class="word-medium">经济</span>
+                    <span class="word-large">冬奥会</span>
+                    <span class="word-small">科技</span>
+                    <span class="word-medium">教育</span>
+                    <span class="word-large">国际</span>
+                    <span class="word-small">体育</span>
+                    <span class="word-medium">政策</span>
+                    <span class="word-small">文化</span>
+                    <span class="word-medium">民生</span>
+                </div>
+            </div>
+            
+            <div class="widget">
+                <h2>分类筛选</h2>
+                <ul class="category-list">
+                    <li><a href="#" class="active">全部</a></li>
+                    <li><a href="#">国内</a></li>
+                    <li><a href="#">国际</a></li>
+                    <li><a href="#">财经</a></li>
+                    <li><a href="#">科技</a></li>
+                    <li><a href="#">体育</a></li>
+                    <li><a href="#">娱乐</a></li>
+                    <li><a href="#">军事</a></li>
+                </ul>
+            </div>
+        </aside>
+    </main>
+
+    <div class="modal" id="submitModal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>投稿/纠错</h2>
+            <form id="submitForm">
+                <div class="form-group">
+                    <label for="title">标题 <span class="required">*</span></label>
+                    <input type="text" id="title" name="title" required>
+                    <span class="error-message"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="link">新闻链接 <span class="required">*</span></label>
+                    <input type="url" id="link" name="link" required>
+                    <span class="error-message"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="source">来源 <span class="required">*</span></label>
+                    <input type="text" id="source" name="source" required>
+                    <span class="error-message"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="summary">简要摘要 <span class="required">*</span></label>
+                    <textarea id="summary" name="summary" rows="4" required></textarea>
+                    <span class="error-message"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">邮箱 <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required>
+                    <span class="error-message"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="image">上传图片</label>
+                    <input type="file" id="image" name="image" accept="image/*">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="reset" class="reset-btn">重置</button>
+                    <button type="submit" class="submit-btn">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="success-message" id="successMessage">
+        <p>提交成功！感谢您的投稿。</p>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>© 2023 中国新闻热搜榜 版权所有</p>
+                <p>备案号：京ICP备12345678号-1</p>
+                <div class="footer-links">
+                    <a href="#">关于我们</a>
+                    <a href="#">联系方式</a>
+                    <a href="#">隐私政策</a>
+                    <a href="#">使用条款</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <button class="back-to-top" id="backToTop" aria-label="返回顶部">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <script src="script.js"></script>
+</body>
+</html>
