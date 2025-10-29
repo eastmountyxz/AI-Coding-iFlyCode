@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI性格测试</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>MBTI性格类型测试</h1>
+        <div id="quiz-container">
+            <div class="progress-bar">
+                <div id="progress"></div>
+            </div>
+            <div class="question-card">
+                <div id="question-text" class="question"></div>
+                <div class="options">
+                    <button id="optionA" class="option-btn"></button>
+                    <button id="optionB" class="option-btn"></button>
+                </div>
+            </div>
+            <div class="navigation">
+                <button id="prev-btn" disabled>上一题</button>
+                <button id="next-btn">下一题</button>
+            </div>
+        </div>
+        <div id="result-container" style="display: none;">
+            <h2>您的MBTI类型是：<span id="mbti-type"></span></h2>
+            <div class="chart-container">
+                <canvas id="score-chart"></canvas>
+            </div>
+            <div id="personality-description" class="description"></div>
+            <button id="restart-btn">重新开始</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
