@@ -4,7 +4,7 @@
 <img width="1531" height="1026" alt="image" src="https://github.com/user-attachments/assets/b1ca0ace-f02c-48d2-999e-3c19e57a193f" />
 
 
-## 第1课 
+## 第1课 AI Coding概念
 
 
 ## 第2课
@@ -13,7 +13,7 @@
 
 ## 第4课
 
-## 第5课
+## 第5课 
 
 ## 第6课
 
