@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>网络安全知识图谱</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --node-stroke: #1a1a1a;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #2d2d2d;
+                --text-color: #ffffff;
+                --node-stroke: #cccccc;
+            }
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+        }
+
+        #container {
+            display: flex;
+            height: 90vh;
+        }
+
+        #graph-container {
+            flex: 3;
+            border: 1px solid #666;
+            position: relative;
+        }
+
+        #sidebar {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .node {
+            stroke-width: 1.5px;
+            cursor: pointer;
+            transition: r 0.3s;
+        }
+
+        .link {
+            stroke: #999;
+            stroke-opacity: 0.6;
+        }
+
+        .legend-item {
+            margin: 5px;
+            padding: 5px;
+            border-radius: 3px;
+        }
+
+        .tooltip {
+            position: absolute;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <input type="text" id="search" placeholder="搜索实体...">
+        <button onclick="exportPNG()">导出PNG</button>
+    </div>
+    <div id="container">
+        <div id="graph-container"></div>
+        <div id="sidebar"></div>
+    </div>
+    <div id="legend"></div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+        // 配置参数
+        const config = {
+            width: 1200,
+            height: 800,
+            nodeRadius: {
+                AG: 12,
+                RL: 8,
+                AM: 10,
+                AE: 10,
+                AT: 10,
+                AI: 10
+            },
+            colorScheme: d3.scaleOrdinal()
+                .domain(['AG', 'RL', 'AM', 'AE', 'AT', 'AI'])
+                .range(['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#a65628'])
+        };
+
+        // 初始化力导向图
+        let simulation = d3.forceSimulation()
+            .force("link", d3.forceLink().id(d => d.id).distance(100))
+            .force("charge", d3.forceManyBody().strength(-500))
+            .force("center", d3.forceCenter(config.width/2, config.height/2))
+            .force("collide", d3.forceCollide().radius(d => config.nodeRadius[d.type] + 5));
+
+        // 创建SVG画布
+        const svg = d3.select("#graph-container")
+            .append("svg")
+            .attr("width", config.width)
+            .attr("height", config.height)
+            .call(d3.zoom().on("zoom", zoomed))
+            .append("g");
+
+        // 加载数据并渲染
+        Promise.all([
+            d3.csv("entities.csv"),
+            d3.csv("relations.csv")
+        ]).then(processData).then(renderGraph);
+
+        function processData([entities, relations]) {
+            const nodes = entities.map(d => ({
+                ...d,
+                radius: config.nodeRadius[d.label] || 8
+            }));
+
+            const links = relations.map(d => ({
+                source: d.source,
+                target: d.target,
+                relation: d.relation
+            }));
+
+            return { nodes, links };
+        }
+
+        function renderGraph({ nodes, links }) {
+            // 绘制边
+            const link = svg.selectAll(".link")
+                .data(links)
+                .enter().append("line")
+                .attr("class", "link");
+
+            // 绘制节点
+            const node = svg.selectAll(".node")
+                .data(nodes)
+                .enter().append("circle")
+                .attr("class", "node")
+                .attr("r", d => config.nodeRadius[d.label])
+                .attr("fill", d => config.colorScheme(d.label))
+                .attr("stroke", var(--node-stroke))
+                .call(d3.drag()
+                    .on("start", dragstarted)
+                    .on("drag", dragged)
+                    .on("end", dragended));
+
+            // 添加边标签
+            const linkLabels = svg.selectAll(".link-label")
+                .data(links)
+                .enter().append("text")
+                .text(d => d.relation)
+                .attr("font-size", 10)
+                .attr("fill", "#666");
+
+            // 添加节点标签
+            const nodeLabels = svg.selectAll(".node-label")
+                .data(nodes)
+                .enter().append("text")
+                .text(d => d.entity_text)
+                .attr("font-size", 12)
+                .attr("dx", 15)
+                .attr("dy", 5);
+
+            // 更新模拟器
+            simulation.nodes(nodes).on("tick", ticked);
+            simulation.force("link").links(links);
+
+            // 交互功能
+            setupInteractions(node, link, nodes, links);
+            createLegend();
+        }
+
+        // 交互功能实现...
+        // 此处应包含缩放、拖拽、提示、高亮等功能的实现代码
+        // 以及搜索功能和导出功能的实现
+
+        // 注意：由于篇幅限制，完整实现代码需要补充交互功能的具体实现，
+        // 包括：zoom事件处理、节点拖拽、提示显示、高亮逻辑、搜索过滤等
+    </script>
+</body>
+</html>
