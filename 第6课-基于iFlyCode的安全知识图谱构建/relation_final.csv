@@ -1,0 +1,46 @@
+head,relation,tail
+APT32,active_in,Vietnam
+APT32,active_in,Philippines
+APT32,active_in,Laos
+APT32,active_in,Cambodia
+APT28,attributed_to,Russia
+APT29,attributed_to,Russia
+APT30,associated_with,China
+APT33,attributed_to,Iran
+APT33,targets,Aviation Industry
+APT33,targets,Energy Industry
+APT37,sponsored_by,North Korea
+APT37,active_in,South Korea
+APT39,conducted_by,Iran
+APT39,targets,Travel Industry
+APT39,targets,Hospitality Industry
+APT39,targets,Academic Industry
+APT39,targets,Telecommunications Industry
+BITTER,active_in,South Asia
+BITTER,active_in,Pakistan
+BITTER,active_in,China
+BITTER,active_in,Bangladesh
+BITTER,active_in,Saudi Arabia
+head,relation,tail
+APT32,active_in,Vietnam
+APT32,active_in,Philippines
+APT32,active_in,Laos
+APT32,active_in,Cambodia
+APT28,attributed_to,Russia
+APT29,attributed_to,Russia
+APT30,associated_with,China
+APT33,attributed_to,Iran
+APT33,targets,Aviation Industry
+APT33,targets,Energy Industry
+APT37,sponsored_by,North Korea
+APT37,active_in,South Korea
+APT39,conducted_by,Iran
+APT39,targets,Travel Industry
+APT39,targets,Hospitality Industry
+APT39,targets,Academic Industry
+APT39,targets,Telecommunications Industry
+BITTER,active_in,South Asia
+BITTER,active_in,Pakistan
+BITTER,active_in,China
+BITTER,active_in,Bangladesh
+BITTER,active_in,Saudi Arabia
