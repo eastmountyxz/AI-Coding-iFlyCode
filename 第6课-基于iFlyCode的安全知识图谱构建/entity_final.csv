@@ -1,0 +1,74 @@
+row_id,entity_text,label,normalized,group_name
+1,APT32,AG,APT32,APT32
+1,Vietnam,RL,Vietnam,APT32
+1,Philippines,RL,Philippines,APT32
+1,Laos,RL,Laos,APT32
+1,Cambodia,RL,Cambodia,APT32
+1,strategic web compromises,AM,Strategic Web Compromise,APT32
+2,APT28,AG,APT28,APT28
+2,Russia,RL,Russia,APT28
+2,Hillary Clinton campaign,AT,Hillary Clinton Campaign,APT28
+2,Democratic National Committee,AT,Democratic National Committee,APT28
+2,World Anti-Doping Agency,AT,World Anti-Doping Agency,APT28
+3,APT29,AG,APT29,APT29
+3,Russia,RL,Russia,APT29
+3,government networks,AT,Government Networks,APT29
+3,SolarWinds Compromise,AE,SolarWinds Compromise,APT29
+4,APT30,AG,APT30,APT30
+4,China,RL,China,APT30
+5,APT33,AG,APT33,APT33
+5,Iran,RL,Iran,APT33
+5,aviation,AI,Aviation Industry,APT33
+5,energy,AI,Energy Industry,APT33
+6,APT37,AG,APT37,APT37
+6,North Korea,RL,North Korea,APT37
+6,South Korea,RL,South Korea,APT37
+6,Operation Daybreak,AE,Operation Daybreak,APT37
+6,Operation Erebus,AE,Operation Erebus,APT37
+6,Golden Time,AE,Golden Time,APT37
+6,Evil New Year,AE,Evil New Year,APT37
+6,Are you Happy?,AE,Are You Happy?,APT37
+6,FreeMilk,AE,FreeMilk,APT37
+6,North Korean Human Rights,AE,North Korean Human Rights,APT37
+6,Evil New Year 2018,AE,Evil New Year 2018,APT37
+7,APT39,AG,APT39,APT39
+7,Iran,RL,Iran,APT39
+7,travel,AI,Travel Industry,APT39
+7,hospitality,AI,Hospitality Industry,APT39
+7,academic,AI,Academic Industry,APT39
+7,telecommunications,AI,Telecommunications Industry,APT39
+8,BITTER,AG,BITTER,BITTER
+8,South Asia,RL,South Asia,BITTER
+8,Pakistan,RL,Pakistan,BITTER
+8,China,RL,China,BITTER
+8,Bangladesh,RL,Bangladesh,BITTER
+8,Saudi Arabia,RL,Saudi Arabia,BITTER
+9,BlackTech,AG,BlackTech,BlackTech
+9,China,RL,China,
+row_id,entity_text,label,normalized,group_name
+1,APT32,AG,APT32,APT32
+1,Vietnam,RL,Vietnam,APT32
+1,Philippines,RL,Philippines,APT32
+1,Laos,RL,Laos,APT32
+1,Cambodia,RL,Cambodia,APT32
+1,strategic web compromises,AM,Strategic Web Compromise,APT32
+2,APT28,AG,APT28,APT28
+2,Russia,RL,Russia,APT28
+2,Hillary Clinton campaign,AT,Hillary Clinton Campaign,APT28
+2,Democratic National Committee,AT,Democratic National Committee,APT28
+2,World Anti-Doping Agency,AT,World Anti-Doping Agency,APT28
+3,APT29,AG,APT29,APT29
+3,Russia,RL,Russia,APT29
+3,government networks,AT,Government Networks,APT29
+3,SolarWinds Compromise,AE,SolarWinds Compromise,APT29
+4,APT30,AG,APT30,APT30
+4,China,RL,China,APT30
+5,APT33,AG,APT33,APT33
+5,Iran,RL,Iran,APT33
+5,aviation,AI,Aviation Industry,APT33
+5,energy,AI,Energy Industry,APT33
+6,APT37,AG,APT37,APT37
+6,North Korea,RL,North Korea,APT37
+6,South Korea,RL,South Korea,APT37
+6,Operation Daybreak,AE,Operation Daybreak,APT37
+6,Operation Erebus,AE,Operation Erebus,

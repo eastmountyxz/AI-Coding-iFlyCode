@@ -1,0 +1,74 @@
+row_id,entity_text,label,normalized,std_id,context_sentence,source_url,group_name
+1,APT32,AG,APT32,,APT32 is a suspected Vietnam-based threat group that has been active since at least 2014.,https://attack.mitre.org/groups/G0050/,APT32
+1,Vietnam,RL,Vietnam,,"...with a strong focus on Southeast Asian countries like Vietnam, the Philippines, Laos, and Cambodia.",https://attack.mitre.org/groups/G0050/,APT32
+1,Philippines,RL,Philippines,,"...Southeast Asian countries like Vietnam, the Philippines, Laos, and Cambodia.",https://attack.mitre.org/groups/G0050/,APT32
+1,Laos,RL,Laos,,"...Southeast Asian countries like Vietnam, the Philippines, Laos, and Cambodia.",https://attack.mitre.org/groups/G0050/,APT32
+1,Cambodia,RL,Cambodia,,"...Southeast Asian countries like Vietnam, the Philippines, Laos, and Cambodia.",https://attack.mitre.org/groups/G0050/,APT32
+1,strategic web compromises,AM,Strategic Web Compromise,,They have extensively used strategic web compromises to compromise victims.,https://attack.mitre.org/groups/G0050/,APT32
+2,APT28,AG,APT28,,APT28 is a threat group that has been attributed to Russia's General Staff Main Intelligence Directorate (GRU)...,https://attack.mitre.org/groups/G0007/,APT28
+2,Russia,RL,Russia,,...attributed to Russia's General Staff Main Intelligence Directorate (GRU)...,https://attack.mitre.org/groups/G0007/,APT28
+2,Hillary Clinton campaign,AT,Hillary Clinton Campaign,,"...compromised the Hillary Clinton campaign, the Democratic National Committee...",https://attack.mitre.org/groups/G0007/,APT28
+2,Democratic National Committee,AT,Democratic National Committee,,"...the Democratic National Committee, and the Democratic Congressional Campaign Committee...",https://attack.mitre.org/groups/G0007/,APT28
+2,World Anti-Doping Agency,AT,World Anti-Doping Agency,,...conducted between 2014 and 2018 against the World Anti-Doping Agency (WADA)...,https://attack.mitre.org/groups/G0007/,APT28
+3,APT29,AG,APT29,,APT29 is threat group that has been attributed to Russia's Foreign Intelligence Service (SVR).,https://attack.mitre.org/groups/G0016/,APT29
+3,Russia,RL,Russia,,...attributed to Russia's Foreign Intelligence Service (SVR).,https://attack.mitre.org/groups/G0016/,APT29
+3,government networks,AT,Government Networks,,...often targeting government networks in Europe and NATO member countries...,https://attack.mitre.org/groups/G0016/,APT29
+3,SolarWinds Compromise,AE,SolarWinds Compromise,,"In April 2021, the US and UK governments attributed the SolarWinds Compromise to the SVR...",https://attack.mitre.org/groups/G0016/,APT29
+4,APT30,AG,APT30,,APT30 is a threat group suspected to be associated with the Chinese government.,https://attack.mitre.org/groups/G0013/,APT30
+4,China,RL,China,,...associated with the Chinese government.,https://attack.mitre.org/groups/G0013/,APT30
+5,APT33,AG,APT33,,APT33 is a suspected Iranian threat group that has carried out operations since at least 2013.,https://attack.mitre.org/groups/G0064/,APT33
+5,Iran,RL,Iran,,...suspected Iranian threat group...,https://attack.mitre.org/groups/G0064/,APT33
+5,aviation,AI,Aviation Industry,,...particular interest in the aviation and energy sectors.,https://attack.mitre.org/groups/G0064/,APT33
+5,energy,AI,Energy Industry,,...aviation and energy sectors.,https://attack.mitre.org/groups/G0064/,APT33
+6,APT37,AG,APT37,,APT37 is a North Korean state-sponsored cyber espionage group that has been active since at least 2012.,https://attack.mitre.org/groups/G0067/,APT37
+6,North Korea,RL,North Korea,,...North Korean state-sponsored cyber espionage group...,https://attack.mitre.org/groups/G0067/,APT37
+6,South Korea,RL,South Korea,,...targeted victims primarily in South Korea...,https://attack.mitre.org/groups/G0067/,APT37
+6,Operation Daybreak,AE,Operation Daybreak,,...linked to the following campaigns between 2016-2018: Operation Daybreak...,https://attack.mitre.org/groups/G0067/,APT37
+6,Operation Erebus,AE,Operation Erebus,,"...Erebus, Golden Time, Evil New Year, Are you Happy?, FreeMilk, North Korean Human Rights, and Evil New Year 2018.",https://attack.mitre.org/groups/G0067/,APT37
+6,Golden Time,AE,Golden Time,,"...Golden Time, Evil New Year, Are you Happy?, FreeMilk, North Korean Human Rights, and Evil New Year 2018.",https://attack.mitre.org/groups/G0067/,APT37
+6,Evil New Year,AE,Evil New Year,,"...Evil New Year, Are you Happy?, FreeMilk, North Korean Human Rights, and Evil New Year 2018.",https://attack.mitre.org/groups/G0067/,APT37
+6,Are you Happy?,AE,Are You Happy?,,"...Are you Happy?, FreeMilk, North Korean Human Rights, and Evil New Year 2018.",https://attack.mitre.org/groups/G0067/,APT37
+6,FreeMilk,AE,FreeMilk,,"...FreeMilk, North Korean Human Rights, and Evil New Year 2018.",https://attack.mitre.org/groups/G0067/,APT37
+6,North Korean Human Rights,AE,North Korean Human Rights,,"...North Korean Human Rights, and Evil New Year 2018.",https://attack.mitre.org/groups/G0067/,APT37
+6,Evil New Year 2018,AE,Evil New Year 2018,,...and Evil New Year 2018.,https://attack.mitre.org/groups/G0067/,APT37
+7,APT39,AG,APT39,,APT39 is one of several names for cyber espionage activity conducted by the Iranian Ministry of Intelligence and Security (MOIS)...,https://attack.mitre.org/groups/G0087/,APT39
+7,Iran,RL,Iran,,...conducted by the Iranian Ministry of Intelligence and Security (MOIS)...,https://attack.mitre.org/groups/G0087/,APT39
+7,travel,AI,Travel Industry,,"...primarily targeted the travel, hospitality, academic, and telecommunications industries...",https://attack.mitre.org/groups/G0087/,APT39
+7,hospitality,AI,Hospitality Industry,,"...hospitality, academic, and telecommunications industries...",https://attack.mitre.org/groups/G0087/,APT39
+7,academic,AI,Academic Industry,,"...academic, and telecommunications industries...",https://attack.mitre.org/groups/G0087/,APT39
+7,telecommunications,AI,Telecommunications Industry,,"...telecommunications industries in Iran and across Asia, Africa, Europe, and North America...",https://attack.mitre.org/groups/G0087/,APT39
+8,BITTER,AG,BITTER,,BITTER is a suspected South Asian cyber espionage threat group that has been active since at least 2013.,https://attack.mitre.org/groups/G1002/,BITTER
+8,South Asia,RL,South Asia,,...suspected South Asian cyber espionage threat group...,https://attack.mitre.org/groups/G1002/,BITTER
+8,Pakistan,RL,Pakistan,,"...targeted government, energy, and engineering organizations in Pakistan, China, Bangladesh, and Saudi Arabia.",https://attack.mitre.org/groups/G1002/,BITTER
+8,China,RL,China,,"...Pakistan, China, Bangladesh, and Saudi Arabia.",https://attack.mitre.org/groups/G1002/,BITTER
+8,Bangladesh,RL,Bangladesh,,"...Bangladesh, and Saudi Arabia.",https://attack.mitre.org/groups/G1002/,BITTER
+8,Saudi Arabia,RL,Saudi Arabia,,...Saudi Arabia.,https://attack.mitre.org/groups/G1002/,BITTER
+9,BlackTech,AG,BlackTech,,"BlackTech is a suspected Chinese cyber espionage group that has primarily targeted organizations in East Asia--particularly Taiwan, Japan, and Hong Kong--and the US since at least 2013.",https://attack.mitre.org/groups/G0098/,BlackTech
+9,China,RL,China,,...以下是针对该CSV文件的威胁情报实体识别结果，严格按需求执行句级抽取并去重规范化：,,
+row_id,entity_text,label,normalized,std_id,context_sentence,source_url,group_name
+1,APT32,AG,APT32,,APT32 is a suspected Vietnam-based threat group that has been active since at least 2014.,https://attack.mitre.org/groups/G0050/,APT32
+1,Vietnam,RL,Vietnam,,"...with a strong focus on Southeast Asian countries like Vietnam, the Philippines, Laos, and Cambodia.",https://attack.mitre.org/groups/G0050/,APT32
+1,Philippines,RL,Philippines,,"...Southeast Asian countries like Vietnam, the Philippines, Laos, and Cambodia.",https://attack.mitre.org/groups/G0050/,APT32
+1,Laos,RL,Laos,,"...Southeast Asian countries like Vietnam, the Philippines, Laos, and Cambodia.",https://attack.mitre.org/groups/G0050/,APT32
+1,Cambodia,RL,Cambodia,,"...Southeast Asian countries like Vietnam, the Philippines, Laos, and Cambodia.",https://attack.mitre.org/groups/G0050/,APT32
+1,strategic web compromises,AM,Strategic Web Compromise,,They have extensively used strategic web compromises to compromise victims.,https://attack.mitre.org/groups/G0050/,APT32
+2,APT28,AG,APT28,,APT28 is a threat group that has been attributed to Russia's General Staff Main Intelligence Directorate (GRU)...,https://attack.mitre.org/groups/G0007/,APT28
+2,Russia,RL,Russia,,...attributed to Russia's General Staff Main Intelligence Directorate (GRU)...,https://attack.mitre.org/groups/G0007/,APT28
+2,Hillary Clinton campaign,AT,Hillary Clinton Campaign,,"...compromised the Hillary Clinton campaign, the Democratic National Committee...",https://attack.mitre.org/groups/G0007/,APT28
+2,Democratic National Committee,AT,Democratic National Committee,,"...the Democratic National Committee, and the Democratic Congressional Campaign Committee...",https://attack.mitre.org/groups/G0007/,APT28
+2,World Anti-Doping Agency,AT,World Anti-Doping Agency,,...conducted between 2014 and 2018 against the World Anti-Doping Agency (WADA)...,https://attack.mitre.org/groups/G0007/,APT28
+3,APT29,AG,APT29,,APT29 is threat group that has been attributed to Russia's Foreign Intelligence Service (SVR).,https://attack.mitre.org/groups/G0016/,APT29
+3,Russia,RL,Russia,,...attributed to Russia's Foreign Intelligence Service (SVR).,https://attack.mitre.org/groups/G0016/,APT29
+3,government networks,AT,Government Networks,,...often targeting government networks in Europe and NATO member countries...,https://attack.mitre.org/groups/G0016/,APT29
+3,SolarWinds Compromise,AE,SolarWinds Compromise,,"In April 2021, the US and UK governments attributed the SolarWinds Compromise to the SVR...",https://attack.mitre.org/groups/G0016/,APT29
+4,APT30,AG,APT30,,APT30 is a threat group suspected to be associated with the Chinese government.,https://attack.mitre.org/groups/G0013/,APT30
+4,China,RL,China,,...associated with the Chinese government.,https://attack.mitre.org/groups/G0013/,APT30
+5,APT33,AG,APT33,,APT33 is a suspected Iranian threat group that has carried out operations since at least 2013.,https://attack.mitre.org/groups/G0064/,APT33
+5,Iran,RL,Iran,,...suspected Iranian threat group...,https://attack.mitre.org/groups/G0064/,APT33
+5,aviation,AI,Aviation Industry,,...particular interest in the aviation and energy sectors.,https://attack.mitre.org/groups/G0064/,APT33
+5,energy,AI,Energy Industry,,...aviation and energy sectors.,https://attack.mitre.org/groups/G0064/,APT33
+6,APT37,AG,APT37,,APT37 is a North Korean state-sponsored cyber espionage group that has been active since at least 2012.,https://attack.mitre.org/groups/G0067/,APT37
+6,North Korea,RL,North Korea,,...North Korean state-sponsored cyber espionage group...,https://attack.mitre.org/groups/G0067/,APT37
+6,South Korea,RL,South Korea,,...targeted victims primarily in South Korea...,https://attack.mitre.org/groups/G0067/,APT37
+6,Operation Daybreak,AE,Operation Daybreak,,...linked to the following campaigns between 2016-2018: Operation Daybreak...,https://attack.mitre.org/groups/G0067/,APT37
+6,Operation Erebus,AE,Operation Erebus,,"...Erebus, Golden Time, Evil New Year, Are you Happy?, FreeMilk, North Korean Human Rights, and Evil New Year 20",,
