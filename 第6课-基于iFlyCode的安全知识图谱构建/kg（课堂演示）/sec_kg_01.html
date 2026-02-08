@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安全知识图谱</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(90deg, #1a3a8f, #2c5cc5);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        .description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .main-content {
+            display: flex;
+            gap: 20px;
+        }
+        .controls {
+            flex: 0 0 300px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        #search {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #2c5cc5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #1a3a8f;
+        }
+        .legend {
+            margin-top: 25px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .sidebar {
+            flex: 0 0 300px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        .sidebar h2 {
+            margin-bottom: 15px;
+            color: #1a3a8f;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        #related-entities {
+            list-style-type: none;
+        }
+        #related-entities li {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        #related-entities li:hover {
+            background-color: #f0f5ff;
+        }
+        .graph-container {
+            flex: 1;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            position: relative;
+        }
+        #graph {
+            width: 100%;
+            height: 600px;
+        }
+        .tooltip {
+            position: absolute;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 4px;
+            pointer-events: none;
+            font-size: 14px;
+            z-index: 10;
+            max-width: 300px;
+        }
+        .node {
+            cursor: pointer;
+            stroke: #fff;
+            stroke-width: 2px;
+        }
+        .link {
+            stroke: #999;
+            stroke-opacity: 0.6;
+        }
+        .highlighted {
+            stroke: #ff5722;
+            stroke-width: 3px;
+        }
+        .hidden {
+            opacity: 0.2;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>安全知识图谱</h1>
+            <p class="description">基于D3.js的高级持续性威胁（APT）组织关系可视化</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="controls">
+                <div class="search-container">
+                    <input type="text" id="search" placeholder="搜索实体...">
+                    <button id="search-btn">搜索</button>
+                </div>
+                
+                <button id="reset-btn">重置视图</button>
+                <button id="export-btn">导出为PNG</button>
+                
+                <div class="legend">
+                    <h3>图例说明</h3>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #1a3a8f;"></div>
+                        <span>APT组织 (AG)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #2c5cc5;"></div>
+                        <span>地区 (RL)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #ff5722;"></div>
+                        <span>攻击手段 (AE)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #4caf50;"></div>
+                        <span>行业目标 (AI)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #9c27b0;"></div>
+                        <span>攻击目标 (AT)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #ffeb3b;"></div>
+                        <span>活动内容 (AM)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="graph-container">
+                <svg id="graph"></svg>
+                <div class="tooltip" style="display: none;"></div>
+            </div>
+            
+            <div class="sidebar">
+                <h2>关联实体</h2>
+                <ul id="related-entities"></ul>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 安全知识图谱可视化 | 使用D3.js构建</p>
+        </footer>
+    </div>
+
+    <script>
+        // 全局变量
+        let nodes = [];
+        let links = [];
+        let nodeMap = new Map();
+        let simulation;
+        let currentHighlight = null;
+        const width = document.getElementById('graph').clientWidth;
+        const height = document.getElementById('graph').clientHeight;
+        const colors = {
+            'AG': '#1a3a8f', // APT Group
+            'RL': '#2c5cc5', // Region
+            'AE': '#ff5722', // Attack Method
+            'AI': '#4caf50', // Industry Target
+            'AT': '#9c27b0', // Attack Target
+            'AM': '#ffeb3b'  // Activity
+        };
+
+        // 初始化SVG画布
+        const svg = d3.select("#graph")
+            .attr("width", width)
+            .attr("height", height);
+        
+        // 定义缩放行为
+        const zoom = d3.zoom()
+            .scaleExtent([0.1, 4])
+            .on("zoom", (event) => {
+                g.attr("transform", event.transform);
+            });
+        
+        svg.call(zoom);
+        
+        // 创建主分组
+        const g = svg.append("g");
+        
+        // 加载数据
+        Promise.all([
+            d3.csv("C:/Users/xiuzhang/Desktop/kg/entity.csv"),
+            d3.csv("C:/Users/xiuzhang/Desktop/kg/relation.csv")
+        ]).then(function(data) {
+            const entities = data[0];
+            const relations = data[1];
+            
+            // 处理实体数据
+            processEntities(entities);
+            
+            // 处理关系数据
+            processRelations(relations);
+            
+            // 初始化力导向图
+            initForceGraph();
+            
+            // 添加事件监听器
+            setupEventListeners();
+        }).catch(function(error) {
+            console.error("Error loading data: ", error);
+            alert("无法加载数据，请检查文件路径是否正确。");
+        });
+        
+        // 处理实体数据
+        function processEntities(entities) {
+            // 跳过标题行
+            const validEntities = entities.filter(d => d.row_id !== "row_id");
+            
+            validEntities.forEach(d => {
+                const node = {
+                    id: d.normalized,
+                    label: d.entity_text,
+                    type: d.label,
+                    group: d.group_name
+                };
+                
+                nodes.push(node);
+                nodeMap.set(node.id, node);
+            });
+        }
+        
+        // 处理关系数据
+        function processRelations(relations) {
+            // 跳过标题行
+            const validRelations = relations.filter(d => d.head !== "head");
+            
+            validRelations.forEach(d => {
+                if (nodeMap.has(d.head) && nodeMap.has(d.tail)) {
+                    const link = {
+                        source: d.head,
+                        target: d.tail,
+                        relation: d.relation
+                    };
+                    
+                    links.push(link);
+                }
+            });
+        }
+        
+        // 初始化力导向图
+        function initForceGraph() {
+            // 清除现有图形
+            g.selectAll("*").remove();
+            
+            // 设置力导向图参数
+            simulation = d3.forceSimulation(nodes)
+                .force("link", d3.forceLink(links).id(d => d.id).distance(100))
+                .force("charge", d3.forceManyBody().strength(-300))
+                .force("center", d3.forceCenter(width / 2, height / 2))
+                .force("collision", d3.forceCollide().radius(30));
+            
+            // 创建连线
+            const link = g.append("g")
+                .selectAll("line")
+                .data(links)
+                .enter()
+                .append("line")
+                .attr("class", "link")
+                .attr("stroke-width", 2);
+            
+            // 创建节点
+            const node = g.append("g")
+                .selectAll("circle")
+                .data(nodes)
+                .enter()
+                .append("circle")
+                .attr("class", "node")
+                .attr("r", 10)
+                .attr("fill", d => colors[d.type] || "#ccc")
+                .call(d3.drag()
+                    .on("start", dragStarted)
+                    .on("drag", dragged)
+                    .on("end", dragEnded))
+                .on("mouseover", handleMouseOver)
+                .on("mouseout", handleMouseOut)
+                .on("click", handleNodeClick);
+            
+            // 更新图形
+            simulation.tick();
+            
+            // 添加标签
+            const label = g.append("g")
+                .selectAll("text")
+                .data(nodes)
+                .enter()
+                .append("text")
+                .attr("dy", -15)
+                .attr("text-anchor", "middle")
+                .text(d => d.label)
+                .style("font-size", "12px")
+                .style("pointer-events", "none");
+            
+            // 动画循环
+            simulation.on("tick", () => {
+                link
+                    .attr("x1", d => d.source.x)
+                    .attr("y1", d => d.source.y)
+                    .attr("x2", d => d.target.x)
+                    .attr("y2", d => d.target.y);
+                
+                node
+                    .attr("cx", d => d.x)
+                    .attr("cy", d => d.y);
+                
+                label
+                    .attr("x", d => d.x)
+                    .attr("y", d => d.y);
+            });
+        }
+        
+        // 拖拽函数
+        function dragStarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+        
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+        
+        function dragEnded(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+        
+        // 鼠标悬停处理
+        function handleMouseOver(event, d) {
+            // 显示工具提示
+            const tooltip = d3.select(".tooltip");
+            tooltip.style("display", "block")
+                .html(`<strong>名称:</strong> ${d.label}<br><strong>类型:</strong> ${d.type}`)
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 28) + "px");
+            
+            // 高亮当前节点和连接线
+            d3.select(this)
+                .transition()
+                .duration(300)
+                .attr("r", 15);
+                
+            svg.selectAll(".link")
+                .transition()
+                .duration(300)
+                .attr("stroke", l => (l.source === d || l.target === d) ? "#ff5722" : "#999")
+                .attr("stroke-width", l => (l.source === d || l.target === d) ? 3 : 2);
+        }
+        
+        function handleMouseOut(event, d) {
+            // 隐藏工具提示
+            d3.select(".tooltip")
+                .style("display", "none");
+                
+            // 恢复节点和连接线的样式
+            d3.select(this)
+                .transition()
+                .duration(300)
+                .attr("r", 10);
+                
+            svg.selectAll(".link")
+                .transition()
+                .duration(300)
+                .attr("stroke", "#999")
+                .attr("stroke-width", 2);
+        }
+        
+        // 节点点击处理
+        function handleNodeClick(event, d) {
+            // 如果已经高亮了同一个节点，则取消高亮
+            if (currentHighlight === d.id) {
+                clearHighlight();
+                return;
+            }
+            
+            // 清除之前的高亮
+            clearHighlight();
+            
+            // 高亮当前节点
+            currentHighlight = d.id;
+            
+            // 高亮节点及其一阶邻居
+            highlightNeighbors(d);
+            
+            // 在侧边栏显示关联关系
+            showRelatedEntities(d);
+        }
+        
+        // 高亮邻居节点
+        function highlightNeighbors(node) {
+            // 获取直接连接的节点
+            const connectedNodes = new Set();
+            links.forEach(l => {
+                if (l.source.id === node.id) connectedNodes.add(l.target.id);
+                if (l.target.id === node.id) connectedNodes.add(l.source.id);
+            });
+            
+            // 高亮当前节点
+            svg.selectAll(".node")
+                .filter(n => n.id === node.id)
+                .classed("highlighted", true)
+                .attr("r", 15);
+            
+            // 高亮直接连接的节点
+            svg.selectAll(".node")
+                .filter(n => connectedNodes.has(n.id))
+                .classed("highlighted", true)
+                .attr("r", 12);
+            
+            // 淡化其他节点
+            svg.selectAll(".node")
+                .filter(n => !connectedNodes.has(n.id) && n.id !== node.id)
+                .classed("hidden", true);
+            
+            // 高亮相关连接线
+            svg.selectAll(".link")
+                .filter(l => l.source.id === node.id || l.target.id === node.id)
+                .classed("highlighted", true)
+                .attr("stroke", "#ff5722")
+                .attr("stroke-width", 3);
+            
+            // 淡化其他连接线
+            svg.selectAll(".link")
+                .filter(l => l.source.id !== node.id && l.target.id !== node.id)
+                .classed("hidden", true);
+        }
+        
+        // 清除高亮
+        function clearHighlight() {
+            svg.selectAll(".node")
+                .classed("highlighted", false)
+                .classed("hidden", false)
+                .attr("r", 10);
+                
+            svg.selectAll(".link")
+                .classed("highlighted", false)
+                .classed("hidden", false)
+                .attr("stroke", "#999")
+                .attr("stroke-width", 2);
+                
+            currentHighlight = null;
+            document.getElementById("related-entities").innerHTML = "";
+        }
+        
+        // 显示关联实体
+        function showRelatedEntities(node) {
+            const relatedList = document.getElementById("related-entities");
+            relatedList.innerHTML = "";
+            
+            // 获取直接连接的节点和关系
+            links.forEach(l => {
+                if (l.source.id === node.id) {
+                    const listItem = document.createElement("li");
+                    listItem.textContent = `${l.target.label} (${l.relation})`;
+                    listItem.addEventListener("click", () => {
+                        smoothPanToNode(l.target.id);
+                    });
+                    relatedList.appendChild(listItem);
+                } else if (l.target.id === node.id) {
+                    const listItem = document.createElement("li");
+                    listItem.textContent = `${l.source.label} (${l.relation})`;
+                    listItem.addEventListener("click", () => {
+                        smoothPanToNode(l.source.id);
+                    });
+                    relatedList.appendChild(listItem);
+                }
+            });
+        }
+        
+        // 平滑移动到指定节点
+        function smoothPanToNode(nodeId) {
+            const targetNode = nodes.find(n => n.id === nodeId);
+            if (!targetNode) return;
+            
+            // 计算中心点偏移量
+            const offsetX = width / 2 - targetNode.x;
+            const offsetY = height / 2 - targetNode.y;
+            
+            // 平滑过渡到节点位置
+            svg.transition()
+                .duration(1000)
+                .call(zoom.transform, d3.zoomIdentity.translate(offsetX, offsetY));
+        }
+        
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 搜索功能
+            document.getElementById("search-btn").addEventListener("click", performSearch);
+            document.getElementById("search").addEventListener("keyup", function(event) {
+                if (event.key === "Enter") {
+                    performSearch();
+                }
+            });
+            
+            // 重置视图
+            document.getElementById("reset-btn").addEventListener("click", function() {
+                clearHighlight();
+                svg.transition()
+                    .duration(750)
+                    .call(zoom.transform, d3.zoomIdentity);
+            });
+            
+            // 导出PNG
+            document.getElementById("export-btn").addEventListener("click", exportAsPNG);
+        }
+        
+        // 执行搜索
+        function performSearch() {
+            const searchTerm = document.getElementById("search").value.trim().toLowerCase();
+            if (!searchTerm) return;
+            
+            // 查找匹配的节点
+            const matchedNodes = nodes.filter(n => 
+                n.label.toLowerCase().includes(searchTerm) || 
+                n.id.toLowerCase().includes(searchTerm)
+            );
+            
+            if (matchedNodes.length > 0) {
+                // 移动到第一个匹配的节点
+                smoothPanToNode(matchedNodes[0].id);
+                
+                // 高亮匹配的节点
+                clearHighlight();
+                currentHighlight = matchedNodes[0].id;
+                highlightNeighbors(matchedNodes[0]);
+                showRelatedEntities(matchedNodes[0]);
+            } else {
+                alert("未找到匹配的实体: " + searchTerm);
+            }
+        }
+        
+        // 导出为PNG
+        function exportAsPNG() {
+            html2canvas(document.querySelector(".graph-container")).then(canvas => {
+                const link = document.createElement("a");
+                link.download = "security-knowledge-graph.png";
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
