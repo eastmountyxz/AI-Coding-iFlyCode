@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安全知识图谱</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        #search-input {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            width: 250px;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        #search-button {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        button {
+            padding: 10px 15px;
+            background-color: #3949ab;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #303f9f;
+        }
+        
+        .main-content {
+            display: flex;
+            height: 700px;
+        }
+        
+        .graph-container {
+            flex: 1;
+            position: relative;
+            border-right: 1px solid #e0e0e0;
+        }
+        
+        #graph {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .sidebar {
+            width: 300px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            overflow-y: auto;
+        }
+        
+        .sidebar h3 {
+            margin-bottom: 15px;
+            color: #1a237e;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 8px;
+        }
+        
+        .legend {
+            margin-bottom: 25px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .node-info {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        
+        .node-info h4 {
+            margin-bottom: 10px;
+            color: #1a237e;
+        }
+        
+        .relations-list {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .relation-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .relation-item:last-child {
+            border-bottom: none;
+        }
+        
+        .tooltip {
+            position: absolute;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 5px;
+            pointer-events: none;
+            font-size: 14px;
+            z-index: 1000;
+            max-width: 300px;
+        }
+        
+        footer {
+            padding: 15px;
+            text-align: center;
+            background-color: #f0f0f0;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .highlighted {
+            stroke: #ff5722;
+            stroke-width: 3px;
+        }
+        
+        .faded {
+            opacity: 0.2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>安全知识图谱可视化</h1>
+            <div class="controls">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="搜索实体...">
+                    <button id="search-button">🔍</button>
+                </div>
+                <button id="export-png">导出PNG</button>
+                <button id="reset-view">重置视图</button>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="graph-container">
+                <svg id="graph"></svg>
+            </div>
+            
+            <div class="sidebar">
+                <div class="legend">
+                    <h3>图例</h3>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #e53935;"></div>
+                        <span>攻击组织 (AG)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #3949ab;"></div>
+                        <span>地理位置 (RL)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #43a047;"></div>
+                        <span>攻击目标 (AT)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #fb8c00;"></div>
+                        <span>攻击方法 (AM)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #8e24aa;"></div>
+                        <span>攻击事件 (AE)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #00acc1;"></div>
+                        <span>行业领域 (AI)</span>
+                    </div>
+                </div>
+                
+                <div class="node-info">
+                    <h3>节点信息</h3>
+                    <p>点击节点查看详细信息</p>
+                </div>
+                
+                <div class="relations-list">
+                    <h3>关联关系</h3>
+                    <p>点击节点查看关联关系</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>安全知识图谱可视化应用 | 使用D3.js构建</p>
+        </footer>
+    </div>
+
+    <script>
+        // 定义颜色映射
+        const colorMap = {
+            'AG': '#e53935', // 攻击组织 - 红色
+            'RL': '#3949ab', // 地理位置 - 蓝色
+            'AT': '#43a047', // 攻击目标 - 绿色
+            'AM': '#fb8c00', // 攻击方法 - 橙色
+            'AE': '#8e24aa', // 攻击事件 - 紫色
+            'AI': '#00acc1'  // 行业领域 - 青色
+        };
+
+        // 定义实体和关系数据
+        const entitiesData = `row_id,entity_text,label,normalized,group_name
+1,APT32,AG,APT32,APT32
+1,Vietnam,RL,Vietnam,APT32
+1,Philippines,RL,Philippines,APT32
+1,Laos,RL,Laos,APT32
+1,Cambodia,RL,Cambodia,APT32
+1,strategic web compromises,AM,Strategic Web Compromise,APT32
+2,APT28,AG,APT28,APT32
+2,Russia,RL,Russia,APT28
+2,Hillary Clinton campaign,AT,Hillary Clinton Campaign,APT28
+2,Democratic National Committee,AT,Democratic National Committee,APT28
+2,World Anti-Doping Agency,AT,World Anti-Doping Agency,APT28
+3,APT29,AG,APT29,APT29
+3,Russia,RL,Russia,APT29
+3,government networks,AT,Government Networks,APT29
+3,SolarWinds Compromise,AE,SolarWinds Compromise,APT29
+4,APT30,AG,APT30,APT30
+4,China,RL,China,APT30
+5,APT33,AG,APT33,APT33
+5,Iran,RL,Iran,APT33
+5,aviation,AI,Aviation Industry,APT33
+5,energy,AI,Energy Industry,APT33
+6,APT37,AG,APT37,APT37
+6,North Korea,RL,North Korea,APT37
+6,South Korea,RL,South Korea,APT37
+6,Operation Daybreak,AE,Operation Daybreak,APT37
+6,Operation Erebus,AE,Operation Erebus,APT37
+6,Golden Time,AE,Golden Time,APT37
+6,Evil New Year,AE,Evil New Year,APT37
+6,Are you Happy?,AE,Are You Happy?,APT37
+6,FreeMilk,AE,FreeMilk,APT37
+6,North Korean Human Rights,AE,North Korean Human Rights,APT37
+6,Evil New Year 2018,AE,Evil New Year 2018,APT37
+7,APT39,AG,APT39,APT39
+7,Iran,RL,Iran,APT39
+7,travel,AI,Travel Industry,APT39
+7,hospitality,AI,Hospitality Industry,APT39
+7,academic,AI,Academic Industry,APT39
+7,telecommunications,AI,Telecommunications Industry,APT39
+8,BITTER,AG,BITTER,BITTER
+8,South Asia,RL,South Asia,BITTER
+8,Pakistan,RL,Pakistan,BITTER
+8,China,RL,China,BITTER
+8,Bangladesh,RL,Bangladesh,BITTER
+8,Saudi Arabia,RL,Saudi Arabia,BITTER
+9,BlackTech,AG,BlackTech,BlackTech
+9,China,RL,China,`;
+
+        const relationsData = `head,relation,tail
+APT32,active_in,Vietnam
+APT32,active_in,Philippines
+APT32,active_in,Laos
+APT32,active_in,Cambodia
+APT28,attributed_to,Russia
+APT29,attributed_to,Russia
+APT30,associated_with,China
+APT33,attributed_to,Iran
+APT33,targets,Aviation Industry
+APT33,targets,Energy Industry
+APT37,sponsored_by,North Korea
+APT37,active_in,South Korea
+APT39,conducted_by,Iran
+APT39,targets,Travel Industry
+APT39,targets,Hospitality Industry
+APT39,targets,Academic Industry
+APT39,targets,Telecommunications Industry
+BITTER,active_in,South Asia
+BITTER,active_in,Pakistan
+BITTER,active_in,China
+BITTER,active_in,Bangladesh
+BITTER,active_in,Saudi Arabia`;
+
+        // 解析CSV数据
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n');
+            const headers = lines[0].split(',');
+            const data = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].trim() === '') continue;
+                
+                const values = lines[i].split(',');
+                const obj = {};
+                
+                for (let j = 0; j < headers.length; j++) {
+                    obj[headers[j]] = values[j] || '';
+                }
+                
+                data.push(obj);
+            }
+            
+            return data;
+        }
+
+        // 处理实体数据
+        const entities = parseCSV(entitiesData);
+        const relations = parseCSV(relationsData);
+
+        // 创建节点和链接数据
+        const nodes = [];
+        const nodeMap = new Map();
+        const links = [];
+
+        // 处理节点
+        entities.forEach(entity => {
+            if (!nodeMap.has(entity.normalized)) {
+                const node = {
+                    id: entity.normalized,
+                    label: entity.entity_text,
+                    type: entity.label,
+                    group: entity.group_name,
+                    x: Math.random() * 800,
+                    y: Math.random() * 600
+                };
+                nodes.push(node);
+                nodeMap.set(entity.normalized, node);
+            }
+        });
+
+        // 处理链接
+        relations.forEach(relation => {
+            const sourceNode = nodeMap.get(relation.head);
+            const targetNode = nodeMap.get(relation.tail);
+            
+            if (sourceNode && targetNode) {
+                links.push({
+                    source: sourceNode,
+                    target: targetNode,
+                    relation: relation.relation
+                });
+            }
+        });
+
+        // 设置SVG尺寸
+        const width = document.getElementById('graph').parentElement.clientWidth;
+        const height = document.getElementById('graph').parentElement.clientHeight;
+
+        const svg = d3.select('#graph')
+            .attr('width', width)
+            .attr('height', height);
+
+        // 创建缩放行为
+        const zoom = d3.zoom()
+            .scaleExtent([0.1, 4])
+            .on('zoom', (event) => {
+                g.attr('transform', event.transform);
+            });
+
+        svg.call(zoom);
+
+        // 创建主分组
+        const g = svg.append('g');
+
+        // 创建力导向图模拟
+        const simulation = d3.forceSimulation(nodes)
+            .force('link', d3.forceLink(links).id(d => d.id).distance(100))
+            .force('charge', d3.forceManyBody().strength(-300))
+            .force('center', d3.forceCenter(width / 2, height / 2))
+            .force('collision', d3.forceCollide().radius(40));
+
+        // 创建链接
+        const link = g.append('g')
+            .attr('class', 'links')
+            .selectAll('line')
+            .data(links)
+            .enter()
+            .append('line')
+            .attr('stroke', '#999')
+            .attr('stroke-width', 2)
+            .attr('stroke-opacity', 0.6);
+
+        // 创建节点
+        const node = g.append('g')
+            .attr('class', 'nodes')
+            .selectAll('circle')
+            .data(nodes)
+            .enter()
+            .append('circle')
+            .attr('r', 15)
+            .attr('fill', d => colorMap[d.type] || '#ccc')
+            .attr('stroke', '#fff')
+            .attr('stroke-width', 2)
+            .call(d3.drag()
+                .on('start', dragStarted)
+                .on('drag', dragged)
+                .on('end', dragEnded))
+            .on('mouseover', showTooltip)
+            .on('mouseout', hideTooltip)
+            .on('click', highlightNeighbors);
+
+        // 添加节点标签
+        const label = g.append('g')
+            .attr('class', 'labels')
+            .selectAll('text')
+            .data(nodes)
+            .enter()
+            .append('text')
+            .text(d => d.label)
+            .attr('font-size', 12)
+            .attr('dx', 18)
+            .attr('dy', 4)
+            .attr('fill', '#333');
+
+        // 创建工具提示
+        const tooltip = d3.select('body').append('div')
+            .attr('class', 'tooltip')
+            .style('opacity', 0);
+
+        // 拖拽函数
+        function dragStarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+
+        function dragEnded(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+
+        // 显示工具提示
+        function showTooltip(event, d) {
+            tooltip.transition()
+                .duration(200)
+                .style('opacity', 0.9);
+            tooltip.html(`
+                <strong>${d.label}</strong><br/>
+                类型: ${d.type}<br/>
+                分组: ${d.group}
+            `)
+                .style('left', (event.pageX + 10) + 'px')
+                .style('top', (event.pageY - 28) + 'px');
+        }
+
+        // 隐藏工具提示
+        function hideTooltip() {
+            tooltip.transition()
+                .duration(500)
+                .style('opacity', 0);
+        }
+
+        // 高亮邻居节点
+        function highlightNeighbors(event, d) {
+            // 重置所有节点和链接的样式
+            node.attr('class', '');
+            link.attr('class', '');
+            label.attr('class', '');
+
+            // 获取邻居节点ID
+            const neighborIds = new Set();
+            links.forEach(link => {
+                if (link.source.id === d.id) {
+                    neighborIds.add(link.target.id);
+                } else if (link.target.id === d.id) {
+                    neighborIds.add(link.source.id);
+                }
+            });
+
+            // 高亮邻居节点和链接
+            node.filter(node => neighborIds.has(node.id) || node.id === d.id)
+                .attr('class', 'highlighted');
+                
+            link.filter(link => link.source.id === d.id || link.target.id === d.id)
+                .attr('class', 'highlighted');
+
+            // 淡化非邻居节点
+            node.filter(node => !neighborIds.has(node.id) && node.id !== d.id)
+                .attr('class', 'faded');
+                
+            link.filter(link => link.source.id !== d.id && link.target.id !== d.id)
+                .attr('class', 'faded');
+
+            // 更新侧边栏信息
+            updateSidebar(d);
+        }
+
+        // 更新侧边栏信息
+        function updateSidebar(d) {
+            // 更新节点信息
+            const nodeInfo = d3.select('.node-info');
+            nodeInfo.html(`
+                <h3>节点信息</h3>
+                <p><strong>名称:</strong> ${d.label}</p>
+                <p><strong>类型:</strong> ${d.type}</p>
+                <p><strong>分组:</strong> ${d.group}</p>
+            `);
+
+            // 更新关联关系
+            const relationsList = d3.select('.relations-list');
+            relationsList.html('<h3>关联关系</h3>');
+            
+            const relatedLinks = links.filter(link => 
+                link.source.id === d.id || link.target.id === d.id
+            );
+            
+            if (relatedLinks.length === 0) {
+                relationsList.append('p').text('暂无关联关系');
+            } else {
+                relatedLinks.forEach(link => {
+                    const isSource = link.source.id === d.id;
+                    const otherNode = isSource ? link.target : link.source;
+                    const relationText = isSource ? 
+                        `${d.label} ${link.relation} ${otherNode.label}` :
+                        `${otherNode.label} ${link.relation} ${d.label}`;
+                    
+                    relationsList.append('div')
+                        .attr('class', 'relation-item')
+                        .text(relationText);
+                });
+            }
+        }
+
+        // 搜索功能
+        document.getElementById('search-button').addEventListener('click', searchNodes);
+        document.getElementById('search-input').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                searchNodes();
+            }
+        });
+
+        function searchNodes() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            if (!searchTerm) return;
+
+            // 重置所有节点样式
+            node.attr('class', '');
+            link.attr('class', '');
+            label.attr('class', '');
+
+            // 查找匹配的节点
+            const matchedNodes = nodes.filter(node => 
+                node.label.toLowerCase().includes(searchTerm)
+            );
+
+            if (matchedNodes.length > 0) {
+                // 高亮匹配的节点
+                node.filter(node => matchedNodes.some(m => m.id === node.id))
+                    .attr('class', 'highlighted');
+
+                // 聚焦到第一个匹配的节点
+                const firstMatch = matchedNodes[0];
+                const scale = 2;
+                const translate = [
+                    width / 2 - scale * firstMatch.x,
+                    height / 2 - scale * firstMatch.y
+                ];
+
+                svg.transition()
+                    .duration(750)
+                    .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
+
+                // 更新侧边栏信息
+                updateSidebar(firstMatch);
+            }
+        }
+
+        // 导出PNG功能
+        document.getElementById('export-png').addEventListener('click', exportPNG);
+
+        function exportPNG() {
+            const svgElement = document.getElementById('graph');
+            const svgData = new XMLSerializer().serializeToString(svgElement);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = svgElement.clientWidth;
+            canvas.height = svgElement.clientHeight;
+            
+            const img = new Image();
+            const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+            const url = URL.createObjectURL(svgBlob);
+            
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0);
+                URL.revokeObjectURL(url);
+                
+                const imgURI = canvas.toDataURL('image/png')
+                    .replace('image/png', 'image/octet-stream');
+                
+                const link = document.createElement('a');
+                link.download = '安全知识图谱.png';
+                link.href = imgURI;
+                link.click();
+            };
+            
+            img.src = url;
+        }
+
+        // 重置视图功能
+        document.getElementById('reset-view').addEventListener('click', resetView);
+
+        function resetView() {
+            // 重置缩放和平移
+            svg.transition()
+                .duration(750)
+                .call(zoom.transform, d3.zoomIdentity);
+            
+            // 重置节点样式
+            node.attr('class', '');
+            link.attr('class', '');
+            label.attr('class', '');
+            
+            // 清空侧边栏
+            d3.select('.node-info').html('<h3>节点信息</h3><p>点击节点查看详细信息</p>');
+            d3.select('.relations-list').html('<h3>关联关系</h3><p>点击节点查看关联关系</p>');
+            
+            // 清空搜索框
+            document.getElementById('search-input').value = '';
+        }
+
+        // 更新力导向图
+        simulation.on('tick', () => {
+            link
+                .attr('x1', d => d.source.x)
+                .attr('y1', d => d.source.y)
+                .attr('x2', d => d.target.x)
+                .attr('y2', d => d.target.y);
+
+            node
+                .attr('cx', d => d.x)
+                .attr('cy', d => d.y);
+
+            label
+                .attr('x', d => d.x)
+                .attr('y', d => d.y);
+        });
+    </script>
+</body>
+</html>
